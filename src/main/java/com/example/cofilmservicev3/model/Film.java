@@ -20,12 +20,12 @@ public class Film {
 
     private String posterPath;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "directedFilms")
     private List<Person> directors;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "writtenFilms")
     private List<Person> writers;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "actoredFilms")
     private List<Person> actors;
 }
