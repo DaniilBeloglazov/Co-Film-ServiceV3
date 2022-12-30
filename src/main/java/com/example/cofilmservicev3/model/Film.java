@@ -21,11 +21,11 @@ public class Film {
     private String posterPath;
 
     @ManyToMany
-    private List<Director> directors;
+    private List<Person> directors;
 
     @ManyToMany
-    private List<Writer> writers;
+    private List<Person> writers;
 
     @ManyToMany
-    private List<Actor> actors;
+    private List<Person> actors;
 }

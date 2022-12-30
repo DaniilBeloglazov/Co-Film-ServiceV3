@@ -1,6 +1,5 @@
-package com.example.cofilmservicev3.model.base;
+package com.example.cofilmservicev3.model;
 
-import com.example.cofilmservicev3.model.base.Person;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

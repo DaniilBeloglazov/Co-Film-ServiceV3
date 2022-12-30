@@ -1,6 +1,5 @@
 package com.example.cofilmservicev3.model;
 
-import com.example.cofilmservicev3.model.base.Person;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +11,27 @@ import java.util.List;
 @Entity @Table
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-public class Writer extends Person {
+public class Person {
+
+    @Id @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    private String lastName;
+
+    private String posterPath;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Photo> photos;
 
     @ManyToMany
     private List<Film> directedFilms;
+
+    @ManyToMany
+    private List<Film> writtenFilms;
+
+    @ManyToMany
+    private List<Film> actoredFilms;
+
 }
