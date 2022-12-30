@@ -1,18 +1,10 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/co_film
-    username: whiteyesx
-    password: whiteyesx
-  jpa:
-    properties:
-      hibernate:
-        show_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-        highlight_sql: true
-    hibernate:
-      ddl-auto: update
-  servlet:
-    multipart:
-      max-file-size: 1MB
-      max-request-size: 1MB
+  profiles:
+    active:
+      - db
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+server:
+  address: 192.168.88.22
+  port: 8080
