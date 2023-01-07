@@ -25,13 +25,13 @@ public class Person {
     @OneToMany(mappedBy = "owner")
     private List<Photo> photos;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "directors")
     private List<Film> directedFilms;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "writers")
     private List<Film> writtenFilms;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "actors")
     private List<Film> actoredFilms;
 
 }

@@ -16,7 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,12 +67,30 @@ public class FilmController {
     }
 
     @PostMapping(value = "/film", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateFilm(@Validated CreateFilmRequest createFilmRequest) {
+    public ResponseEntity<Void> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
 
         Film filmToCreate = modelMapper.map(createFilmRequest, Film.class);
 
         filmService.createFilm(filmToCreate, createFilmRequest.getPosterImage());
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/film/{id}")
+    public ResponseEntity<Void> updateFilmMetadata(@PathVariable Long id) {
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/film/{id}")
+    public ResponseEntity<Void> updateFilmPoster(@PathVariable Long id, MultipartFile updatedPoster) {
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/film/{id}")
+    public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+
+        return ResponseEntity.ok().build();
     }
 }
