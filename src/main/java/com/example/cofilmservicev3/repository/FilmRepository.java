@@ -2,6 +2,8 @@ package com.example.cofilmservicev3.repository;
 
 import com.example.cofilmservicev3.model.Film;
 import com.example.cofilmservicev3.repository.projection.FilmProjection;
+import com.example.cofilmservicev3.repository.projection.ShortFilmProjection;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -23,7 +25,7 @@ public interface FilmRepository extends JpaRepository<Film, Long> {
             "LEFT JOIN f.directors AS dir " +
             "LEFT JOIN f.writers AS wr " +
             "LEFT JOIN f.actors AS act")
-    List<FilmProjection> shortFindAll();
+    List<ShortFilmProjection> shortFindAll(Pageable pageable);
     @Query("SELECT f.id AS id, " +
                 "f.title AS title, " +
                 "f.posterPath as posterPath, " +

@@ -11,7 +11,7 @@ public class CreateFilmRequest {
 
     private String title;
 
-    private MultipartFile posterImage;
+    private MultipartFile poster;
 
     private List<Long> directors;
     

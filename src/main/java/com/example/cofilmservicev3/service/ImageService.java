@@ -34,6 +34,9 @@ public class ImageService {
 
     public String updateImage(String oldImagePath, MultipartFile image) throws IOException {
 
+        if (image == null)
+            return oldImagePath;
+
         Files.deleteIfExists(Path.of(oldImagePath));
 
         return saveFilmPoster(image);

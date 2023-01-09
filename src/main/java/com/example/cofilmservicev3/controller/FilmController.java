@@ -1,10 +1,11 @@
 package com.example.cofilmservicev3.controller;
 
 import com.example.cofilmservicev3.dto.CreateFilmRequest;
-import com.example.cofilmservicev3.dto.UpdateFilmMetadataRequest;
+import com.example.cofilmservicev3.dto.UpdateFilmRequest;
 import com.example.cofilmservicev3.model.Film;
 import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.repository.projection.FilmProjection;
+import com.example.cofilmservicev3.repository.projection.ShortFilmProjection;
 import com.example.cofilmservicev3.service.FilmService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.AbstractConverter;
@@ -17,11 +18,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -41,11 +41,6 @@ public class FilmController {
                     mapper.skip(Film::setId);
                     mapper.skip(Film::setPosterPath);
                 });
-        modelMapper.createTypeMap(UpdateFilmMetadataRequest.class, Film.class)
-                .addMappings(mapper -> {
-                    mapper.skip(Film::setId);
-                    mapper.skip(Film::setPosterPath);
-                });
         modelMapper.addConverter(new AbstractConverter<Long, Person>() {
             @Override
             protected Person convert(Long source) { // For mapping List<Long> to List<Person>
@@ -57,14 +52,14 @@ public class FilmController {
     }
 
     @GetMapping("/films")
-    public ResponseEntity<List<FilmProjection>> listAllFilms(@PageableDefault Pageable pageRequest) {
+    public ResponseEntity<List<ShortFilmProjection>> listAllFilms(@PageableDefault Pageable pageRequest) {
 
-        List<FilmProjection> films = filmService.getAllFilms(pageRequest);
+        List<ShortFilmProjection> films = filmService.getAllFilms(pageRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(films);
     }
 
-    @GetMapping("/film/{id}")
+    @GetMapping("/films/{id}")
     public ResponseEntity<FilmProjection> listFilm(@PathVariable Long id) {
 
         FilmProjection film = filmService.getFilmById(id);
@@ -76,29 +71,24 @@ public class FilmController {
     public ResponseEntity<Void> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
 
         Film filmToCreate = modelMapper.map(createFilmRequest, Film.class);
-        filmService.createFilm(filmToCreate, createFilmRequest.getPosterImage());
+        filmService.createFilm(filmToCreate, createFilmRequest.getPoster());
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PatchMapping("/film/{id}/info")
-    public ResponseEntity<Void> updateFilmMetadata(@PathVariable Long id, @RequestBody UpdateFilmMetadataRequest updateRequest) {
+    @PatchMapping(value = "/films/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateFilm(
+            @PathVariable Long id,
+            @Validated UpdateFilmRequest updateRequest
+            ) throws IOException, InvocationTargetException, IllegalAccessException {
 
         Film updatedFilm = modelMapper.map(updateRequest, Film.class);
-        filmService.updateFilmMetadata(id, updatedFilm);
+        filmService.updateFilm(id, updatedFilm, updateRequest.getPoster());
 
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping(value = "/film/{id}/poster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateFilmPoster(@PathVariable Long id, @RequestPart MultipartFile updatedPoster) throws IOException {
-
-        filmService.updateFilmPosterImage(id, updatedPoster);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/film/{id}")
+    @DeleteMapping("/films/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
 
         filmService.deleteFilm(id);
