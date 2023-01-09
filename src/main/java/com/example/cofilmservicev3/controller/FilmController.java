@@ -1,6 +1,7 @@
 package com.example.cofilmservicev3.controller;
 
 import com.example.cofilmservicev3.dto.CreateFilmRequest;
+import com.example.cofilmservicev3.dto.UpdateFilmMetadataRequest;
 import com.example.cofilmservicev3.model.Film;
 import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.repository.projection.FilmProjection;
@@ -40,6 +41,11 @@ public class FilmController {
                     mapper.skip(Film::setId);
                     mapper.skip(Film::setPosterPath);
                 });
+        modelMapper.createTypeMap(UpdateFilmMetadataRequest.class, Film.class)
+                .addMappings(mapper -> {
+                    mapper.skip(Film::setId);
+                    mapper.skip(Film::setPosterPath);
+                });
         modelMapper.addConverter(new AbstractConverter<Long, Person>() {
             @Override
             protected Person convert(Long source) { // For mapping List<Long> to List<Person>
@@ -70,26 +76,32 @@ public class FilmController {
     public ResponseEntity<Void> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
 
         Film filmToCreate = modelMapper.map(createFilmRequest, Film.class);
-
         filmService.createFilm(filmToCreate, createFilmRequest.getPosterImage());
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PatchMapping("/film/{id}")
-    public ResponseEntity<Void> updateFilmMetadata(@PathVariable Long id) {
+    @PatchMapping("/film/{id}/info")
+    public ResponseEntity<Void> updateFilmMetadata(@PathVariable Long id, @RequestBody UpdateFilmMetadataRequest updateRequest) {
+
+        Film updatedFilm = modelMapper.map(updateRequest, Film.class);
+        filmService.updateFilmMetadata(id, updatedFilm);
 
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/film/{id}")
-    public ResponseEntity<Void> updateFilmPoster(@PathVariable Long id, MultipartFile updatedPoster) {
+    @PatchMapping(value = "/film/{id}/poster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateFilmPoster(@PathVariable Long id, @RequestPart MultipartFile updatedPoster) throws IOException {
+
+        filmService.updateFilmPosterImage(id, updatedPoster);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/film/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+
+        filmService.deleteFilm(id);
 
         return ResponseEntity.ok().build();
     }

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FilmService {
 
-    private final String imageRoot = "Need to Configure"; //TODO
+    private final ImageService imageService;
     private final FilmRepository filmRepository;
     private final PersonRepository personRepository;
 
@@ -42,10 +42,6 @@ public class FilmService {
     }
     @Transactional
     public void createFilm(Film filmToCreate, MultipartFile posterImage) throws IOException {
-
-        File posterImageFile = new File(imageRoot + UUID.randomUUID() + "." + posterImage.getContentType().split("/")[1]);
-
-        filmToCreate.setPosterPath(posterImageFile.getPath());
 
         filmToCreate.setDirectors(filmToCreate.getDirectors().stream()
                 .map(person -> personRepository.findById(person.getId())
@@ -68,9 +64,10 @@ public class FilmService {
                         )))
                 .collect(Collectors.toList()));
 
-        filmRepository.save(filmToCreate);
+        String posterPath = imageService.saveFilmPoster(posterImage);
+        filmToCreate.setPosterPath(posterPath);
 
-        posterImage.transferTo(posterImageFile);
+        filmRepository.save(filmToCreate);
     }
 
     public void updateFilmMetadata(Long id, Film updatedFilm) {
@@ -87,15 +84,10 @@ public class FilmService {
         Film filmToUpdate = filmRepository.findById(id)
                 .orElseThrow(() -> new FilmNotFoundException(""));
 
-        Files.delete(Path.of(filmToUpdate.getPosterPath()));
-
-        File posterImageFile = new File(imageRoot + UUID.randomUUID() + "." + updatedImage.getContentType().split("/")[1]);
-
-        filmToUpdate.setPosterPath(posterImageFile.getAbsolutePath());
+        String posterPath = imageService.updateImage(filmToUpdate.getPosterPath(), updatedImage);
+        filmToUpdate.setPosterPath(posterPath);
 
         filmRepository.save(filmToUpdate);
-
-        updatedImage.transferTo(posterImageFile);
     }
 
     public void deleteFilm(Long id) {
