@@ -1,11 +1,12 @@
 package com.example.cofilmservicev3.dto;
 
-import com.example.cofilmservicev3.annotation.NullableNotBlank;
+import com.example.cofilmservicev3.annotation.NotBlankMultipart;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -15,13 +16,13 @@ import java.util.List;
 public class UpdateFilmRequest {
 
     @Schema(description = "Title of the film.")
-    @NullableNotBlank
     private String title;
 
     @Schema(description = "Description of the film.")
     private String description;
+    @Min(1895) @Max(2030)
     @Schema(description = "Year of film production.")
-    private String productionYear;
+    private Long productionYear;
 
     @Schema(description = "Film budget (dollars).")
     private Double budget; // бюджет
@@ -31,10 +32,10 @@ public class UpdateFilmRequest {
 
     @Schema(description = "Film audience.")
     private Long audience;
-    @Min(value = 25)
+    @Min(0) @Max(18)
     @Schema(description = "Minimum allowable age.")
     private Long ageRating;
-
+    @NotBlankMultipart
     @Schema(description = "Picture used as Film's poster.")
     private MultipartFile poster;
 

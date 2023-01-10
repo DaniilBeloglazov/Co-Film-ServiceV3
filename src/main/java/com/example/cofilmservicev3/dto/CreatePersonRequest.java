@@ -1,5 +1,6 @@
 package com.example.cofilmservicev3.dto;
 
+import com.example.cofilmservicev3.annotation.NotBlankMultipart;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,6 @@ public class CreatePersonRequest {
     @NotEmpty
     private String lastName;
     @Schema(description = "Picture used as Person's poster.")
-    @NotEmpty
+    @NotEmpty @NotBlankMultipart
     private MultipartFile poster;
 }

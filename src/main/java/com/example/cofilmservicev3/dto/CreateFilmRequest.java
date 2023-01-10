@@ -1,5 +1,6 @@
 package com.example.cofilmservicev3.dto;
 
+import com.example.cofilmservicev3.annotation.NotBlankMultipart;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,7 +43,7 @@ public class CreateFilmRequest {
     private Long ageRating;
 
     @Schema(description = "Picture used as Film's poster.")
-    @NotNull
+    @NotNull @NotBlankMultipart
     private MultipartFile poster;
 
     @Schema(description = "Genre ID array.")
