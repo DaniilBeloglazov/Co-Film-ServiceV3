@@ -9,6 +9,6 @@ import java.util.Objects;
 public class NotBlankMultipartValidator implements ConstraintValidator<NotBlankMultipart, MultipartFile> {
     @Override
     public boolean isValid(MultipartFile value, ConstraintValidatorContext context) {
-        return Objects.nonNull(value) && Objects.nonNull(value.getContentType());
+        return Objects.isNull(value) || Objects.nonNull(value.getContentType());
     }
 }

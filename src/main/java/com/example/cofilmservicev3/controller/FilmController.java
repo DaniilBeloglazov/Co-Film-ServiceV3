@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -70,7 +71,7 @@ public class FilmController {
     @GetMapping("/films")
     @PageableEndpoint
     public ResponseEntity<List<FilmProjection>> listAllFilms(
-            @PageableDefault(size = 10, sort = "desc,productionYear") @Parameter(hidden = true) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "productionYear", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable) {
 
         List<FilmProjection> films = filmService.getAllFilms(pageable);
 

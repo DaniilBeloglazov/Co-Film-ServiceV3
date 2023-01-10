@@ -9,6 +9,7 @@ import com.example.cofilmservicev3.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,11 +26,11 @@ public class EntityMapper extends BeanUtilsBean {
     @Override
     public void copyProperty(Object dest, String name, Object value)
             throws IllegalAccessException, InvocationTargetException {
-        if(value == null) return; // Do not copy null values
-        if(value instanceof String && ((String) value).trim().length() == 0) {
-            log.debug("Skip blank on copy");
-            return;
-        } // Do not copy blank values
+        if(value == null || (value instanceof List<?> && (((List<?>) value).isEmpty()))) return; // Do not copy null values
+//        if(value instanceof String && StringUtils.isBlank((String)value)) {
+//            log.debug("Skip blank on copy");
+//            return;
+//        } // Do not copy blank values
         if (name.equals("genres")) {
             List<Genre> genre = (List<Genre>) value;
             value = genre.stream().map((genreForMap) -> genreRepository.findById(genreForMap.getId())

@@ -36,7 +36,7 @@ public class PersonController {
     @GetMapping("/persons")
     @PageableEndpoint
     public ResponseEntity<List<PersonProjection>> listPersons(
-            @PageableDefault(size = 10, sort = "desc,productionYear") @Parameter(hidden = true) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "productionYear,desc") @Parameter(hidden = true) Pageable pageable) {
         List<PersonProjection> persons = personService.getAllPersons(pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(persons);
