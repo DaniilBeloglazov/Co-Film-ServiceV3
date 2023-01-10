@@ -1,11 +1,8 @@
 package com.example.cofilmservicev3.repository.projection;
 
-public interface ShortPersonProjection {
+public interface FilmGenreProjection {
+
     Long getId();
 
     String getName();
-
-    String getLastName();
-
-    String getPosterPath();
 }

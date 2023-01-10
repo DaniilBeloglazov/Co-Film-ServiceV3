@@ -22,7 +22,7 @@ public class Person {
 
     private String posterPath;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Photo> photos;
 
     @ManyToMany(mappedBy = "directors")

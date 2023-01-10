@@ -2,7 +2,9 @@ package com.example.cofilmservicev3.repository.projection;
 
 import java.util.List;
 
-public interface PersonProjection extends ShortPersonProjection {
+public interface PersonProjection {
+
+    Long getId();
 
     String getName();
 
@@ -11,4 +13,10 @@ public interface PersonProjection extends ShortPersonProjection {
     String getPosterPath();
 
     List<PhotoProjection> getPhotos();
+
+    List<PersonFilmProjection> getDirectedFilms();
+
+    List<PersonFilmProjection> getWrittenFilms();
+
+    List<PersonFilmProjection> getActoredFilms();
 }

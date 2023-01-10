@@ -18,7 +18,22 @@ public class Film {
 
     private String title;
 
+    private String description;
+
+    private Long productionYear;
+
+    private Long budget; // бюджет
+
+    private Long boxOffice; // сборы
+
+    private Long audience;
+
+    private Long ageRating;
+
     private String posterPath;
+
+    @ManyToMany
+    private List<Genre> genres;
 
     @ManyToMany
     private List<Person> directors;

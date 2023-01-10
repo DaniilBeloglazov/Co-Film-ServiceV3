@@ -4,13 +4,11 @@ import com.example.cofilmservicev3.exception.FilmNotFoundException;
 import com.example.cofilmservicev3.exception.PersonNotFoundException;
 import com.example.cofilmservicev3.model.Film;
 import com.example.cofilmservicev3.repository.FilmRepository;
+import com.example.cofilmservicev3.repository.GenreRepository;
 import com.example.cofilmservicev3.repository.PersonRepository;
 import com.example.cofilmservicev3.repository.projection.FilmProjection;
-import com.example.cofilmservicev3.repository.projection.ShortFilmProjection;
-import com.example.cofilmservicev3.utility.CustomBeanUtils;
-import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.example.cofilmservicev3.utility.EntityMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,42 +27,40 @@ public class FilmService {
     private final FilmRepository filmRepository;
     private final PersonRepository personRepository;
 
-    private final CustomBeanUtils beanUtils;
+    private final GenreRepository genreRepository;
 
-    public List<ShortFilmProjection> getAllFilms(Pageable pageable) {
+    private final EntityMapper beanUtils;
 
-        List<ShortFilmProjection> filmProjections = filmRepository.shortFindAll(pageable);
+    public List<FilmProjection> getAllFilms(Pageable pageable) {
+
+        List<FilmProjection> filmProjections = filmRepository.shortFindAll(pageable);
 
         return filmProjections;
     }
 
-    public FilmProjection getFilmById(Long id) {
+    public FilmProjection getFilm(Long id) {
 
         return filmRepository.shortFindById(id);
     }
+
     @Transactional
     public void createFilm(Film filmToCreate, MultipartFile posterImage) throws IOException {
 
-        filmToCreate.setDirectors(filmToCreate.getDirectors().stream()
-                .map(person -> personRepository.findById(person.getId())
-                        .orElseThrow(() -> new PersonNotFoundException(
-                                MessageFormat.format("Person with id: {0} not found", person.getId())
-                        )))
-                .collect(Collectors.toList()));
+        filmToCreate.getDirectors().forEach(person -> personRepository.findById(person.getId())
+                .orElseThrow(() -> new PersonNotFoundException(
+                        MessageFormat.format("Person with id: {0} not found", person.getId())
+                )));
 
-        filmToCreate.setWriters(filmToCreate.getWriters().stream()
-                .map(person -> personRepository.findById(person.getId())
-                        .orElseThrow(() -> new PersonNotFoundException(
-                                MessageFormat.format("Person with id: {0} not found", person.getId())
-                        )))
-                .collect(Collectors.toList()));
+        filmToCreate.getWriters().forEach(person -> personRepository.findById(person.getId())
+                .orElseThrow(() -> new PersonNotFoundException(
+                        MessageFormat.format("Person with id: {0} not found", person.getId())
+                )));
 
-        filmToCreate.setActors(filmToCreate.getActors().stream()
-                .map(person -> personRepository.findById(person.getId())
+        filmToCreate.getActors()
+                .forEach(person -> personRepository.findById(person.getId())
                         .orElseThrow(() -> new PersonNotFoundException(
                                 MessageFormat.format("Person with id: {0} not found", person.getId())
-                        )))
-                .collect(Collectors.toList()));
+                        )));
 
         String posterPath = imageService.saveFilmPoster(posterImage);
         filmToCreate.setPosterPath(posterPath);
@@ -82,21 +77,50 @@ public class FilmService {
         String posterPath = imageService.updateImage(filmToUpdate.getPosterPath(), updatedPoster);
 
         beanUtils.copyProperties(filmToUpdate, updatedFilm);
+
+//        updateRelations(filmToUpdate);
         filmToUpdate.setPosterPath(posterPath);
 
         filmRepository.save(filmToUpdate);
     }
 
-    public void updateFilmPosterImage(Long id, MultipartFile updatedImage) throws IOException {
-
-        Film filmToUpdate = filmRepository.findById(id)
-                .orElseThrow(() -> new FilmNotFoundException(""));
-
-        String posterPath = imageService.updateImage(filmToUpdate.getPosterPath(), updatedImage);
-        filmToUpdate.setPosterPath(posterPath);
-
-        filmRepository.save(filmToUpdate);
-    }
+//    private void updateRelations(Film filmToUpdate) {
+//
+//        if (filmToUpdate.getGenres() != null)
+//            for (Genre genre : filmToUpdate.getGenres()) {
+//                genre = genreRepository.findById(genre.getId())
+//                        .orElseThrow(() -> new PersonNotFoundException(
+//                                MessageFormat.format("Director with id: {0} not found", genre.getId())
+//                        ));
+//            }
+//        if (filmToUpdate.getDirectors() != null)
+//            filmToUpdate.setDirectors(filmToUpdate.getDirectors()
+//                    .stream()
+//                    .map((director) -> personRepository.findById(director.getId())
+//                            .orElseThrow(() -> new PersonNotFoundException(
+//                                    MessageFormat.format("Director with id: {0} not found", director.getId())
+//                            )))
+//                    .toList()
+//            );
+//        if (filmToUpdate.getWriters() != null)
+//            filmToUpdate.setWriters(filmToUpdate.getWriters()
+//                    .stream()
+//                    .map((writer) -> personRepository.findById(writer.getId())
+//                            .orElseThrow(() -> new PersonNotFoundException(
+//                                    MessageFormat.format("Writer with id: {0} not found", writer.getId())
+//                            )))
+//                    .toList()
+//            );
+//        if (filmToUpdate.getActors() != null)
+//            filmToUpdate.setActors(filmToUpdate.getActors()
+//                    .stream()
+//                    .map((actor) -> personRepository.findById(actor.getId())
+//                            .orElseThrow(() -> new PersonNotFoundException(
+//                                    MessageFormat.format("Actor with id: {0} not found", actor.getId())
+//                            )))
+//                    .toList()
+//            );
+//    }
 
     public void deleteFilm(Long id) {
 

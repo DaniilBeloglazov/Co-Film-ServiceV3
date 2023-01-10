@@ -14,8 +14,9 @@ import java.util.UUID;
 @Slf4j
 public class ImageService {
 
-    private final String filmImagesRoot = "/data/images/film/";
-    private final String personImagesRoot = "/data/images/person/";
+    private final String filmPosterRoot = "/data/images/film/";
+    private final String personPosterRoot = "/data/images/person/";
+    private final String personPhotosRoot = "/data/images/person/photo/";
 
     /**
      *
@@ -26,7 +27,16 @@ public class ImageService {
     public String saveFilmPoster(MultipartFile multipartFile) throws IOException {
 
         String fileExtension = getExtension(multipartFile);
-        File file = new File(filmImagesRoot + UUID.randomUUID() + fileExtension);
+        File file = new File(filmPosterRoot + UUID.randomUUID() + fileExtension);
+        multipartFile.transferTo(file);
+        log.info("File: " + file.getAbsolutePath() + " was saved");
+        return file.getAbsolutePath();
+    }
+
+    public String savePersonPoster(MultipartFile multipartFile) throws IOException {
+
+        String fileExtension = getExtension(multipartFile);
+        File file = new File(personPosterRoot + UUID.randomUUID() + fileExtension);
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
         return file.getAbsolutePath();
@@ -44,5 +54,14 @@ public class ImageService {
 
     private String getExtension(MultipartFile multipartFile) {
         return "." + multipartFile.getContentType().split("/")[1];
+    }
+
+    public String savePersonPhoto(MultipartFile multipartFile) throws IOException {
+
+        String fileExtension = getExtension(multipartFile);
+        File file = new File(personPhotosRoot + UUID.randomUUID() + fileExtension);
+        multipartFile.transferTo(file);
+        log.info("File: " + file.getAbsolutePath() + " was saved");
+        return file.getAbsolutePath();
     }
 }

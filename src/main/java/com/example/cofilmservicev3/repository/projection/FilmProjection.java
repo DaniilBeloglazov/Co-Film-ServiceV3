@@ -1,5 +1,7 @@
 package com.example.cofilmservicev3.repository.projection;
 
+import com.example.cofilmservicev3.model.Genre;
+
 import java.util.List;
 
 public interface FilmProjection {
@@ -8,12 +10,26 @@ public interface FilmProjection {
 
     String getTitle();
 
+    String getDescription();
+
+    Long getProductionYear();
+
+    Double getBudget();
+
+    Double getBoxOffice();
+
+    Long getAudience();
+
+    Long getAgeRating();
+
     String getPosterPath();
 
-    List<PersonProjection> getDirectors();
+    List<FilmGenreProjection> getGenres();
 
-    List<PersonProjection> getWriters();
+    List<FilmPersonProjection> getDirectors();
 
-    List<PersonProjection> getActors();
+    List<FilmPersonProjection> getWriters();
+
+    List<FilmPersonProjection> getActors();
 
 }

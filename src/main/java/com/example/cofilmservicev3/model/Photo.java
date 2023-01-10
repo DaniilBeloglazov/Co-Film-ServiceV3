@@ -16,4 +16,9 @@ public class Photo {
 
     @ManyToOne
     private Person owner;
+
+    public Photo(String path, Person owner) {
+        this.path = path;
+        this.owner = owner;
+    }
 }
