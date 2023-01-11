@@ -14,6 +14,10 @@ import java.util.List;
 public interface FilmRepository extends JpaRepository<Film, Long> {
 
     boolean existsByTitle(String title);
+
+    @Query("SELECT film FROM Film film " +
+            "WHERE LOWER(film.title) LIKE %:search%")
+    List<FilmProjection> findAllSearch(@Param("search") String searchText, Pageable pageable);
     @Query("SELECT film FROM Film film ")
     List<FilmProjection> shortFindAll(Pageable pageable);
     @Query("SELECT film FROM Film film WHERE film.id = :id")

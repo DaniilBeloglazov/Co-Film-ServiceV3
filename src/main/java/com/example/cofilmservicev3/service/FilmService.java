@@ -32,11 +32,12 @@ public class FilmService {
 
     private final EntityMapper beanUtils;
 
-    public List<FilmProjection> getAllFilms(Pageable pageable) {
+    public List<FilmProjection> getAllFilms(Pageable pageable, String query) {
 
-        List<FilmProjection> filmProjections = filmRepository.shortFindAll(pageable);
+        if (query != null)
+            return filmRepository.findAllSearch(query, pageable);
 
-        return filmProjections;
+        return filmRepository.shortFindAll(pageable);
     }
 
     public FilmProjection getFilm(Long id) {

@@ -69,16 +69,19 @@ public class FilmController {
             }
         });
     }
+
     @Operation(summary = "Used to list all existing Films")
     @GetMapping("/films")
     @PageableEndpoint
     public ResponseEntity<List<FilmProjection>> listAllFilms(
-            @PageableDefault(size = 10, sort = "productionYear", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "productionYear", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable,
+            @Parameter(description = "Parameter for searching. (title)") @RequestParam(required = false) String query) {
 
-        List<FilmProjection> films = filmService.getAllFilms(pageable);
+        List<FilmProjection> films = filmService.getAllFilms(pageable, query);
 
         return ResponseEntity.status(HttpStatus.OK).body(films);
     }
+
     @Operation(summary = "Used to list specific Film by id.")
     @GetMapping("/films/{id}")
     public ResponseEntity<FilmProjection> listFilm(@PathVariable Long id) {
@@ -87,6 +90,7 @@ public class FilmController {
 
         return ResponseEntity.status(HttpStatus.OK).body(film);
     }
+
     @Operation(summary = "Used to create Film.")
     @PostMapping(value = "/film", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CreateFilmResponse> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
@@ -97,18 +101,20 @@ public class FilmController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(payload);
     }
+
     @Operation(summary = "Used to update Film by id. All parameters are optional")
     @PatchMapping(value = "/films/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateFilm(
             @PathVariable Long id,
             @Validated UpdateFilmRequest updateRequest
-            ) throws IOException, InvocationTargetException, IllegalAccessException {
+    ) throws IOException, InvocationTargetException, IllegalAccessException {
 
         Film updatedFilm = modelMapper.map(updateRequest, Film.class);
         filmService.updateFilm(id, updatedFilm, updateRequest.getPoster());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @Operation(summary = "Used to delete Film by id.")
     @DeleteMapping("/films/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
