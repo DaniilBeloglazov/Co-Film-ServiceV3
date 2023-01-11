@@ -1,6 +1,8 @@
 package com.example.cofilmservicev3.controller;
 
 import com.example.cofilmservicev3.dto.MessageResponse;
+import com.example.cofilmservicev3.exception.FilmNotFoundException;
+import com.example.cofilmservicev3.exception.PersonNotFoundException;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,5 +23,13 @@ public class AdviceController {
                     .body(new MessageResponse("Multipart file should be not blank. Uncheck send empty value."));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(value = {PersonNotFoundException.class, FilmNotFoundException.class})
+    public ResponseEntity<MessageResponse> handleInvalidRequests(RuntimeException exception) {
+
+        val message = new MessageResponse(exception.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 }

@@ -14,7 +14,7 @@ public class Photo {
     private Long id;
     private String path;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Person owner;
 
     public Photo(String path, Person owner) {

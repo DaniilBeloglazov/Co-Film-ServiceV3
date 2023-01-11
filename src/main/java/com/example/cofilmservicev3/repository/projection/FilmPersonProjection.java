@@ -7,5 +7,5 @@ public interface FilmPersonProjection {
 
     String getLastName();
 
-    String getPosterPath();
+    String getAvatarUri();
 }

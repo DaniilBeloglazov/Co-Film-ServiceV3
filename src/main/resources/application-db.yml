@@ -12,6 +12,3 @@ spring:
         highlight_sql: true
     hibernate:
       ddl-auto: update
-logging:
-  level:
-    org.hibernate.type: debug

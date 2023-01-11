@@ -31,7 +31,7 @@ public class Film {
 
     private Long ageRating;
 
-    private String posterPath;
+    private String avatarUri;
 
     @ManyToMany
     private List<Genre> genres;

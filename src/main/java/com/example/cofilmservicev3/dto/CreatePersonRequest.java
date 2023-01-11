@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "Data transfer object for Person creation.")
 @Data @NoArgsConstructor
@@ -18,6 +19,6 @@ public class CreatePersonRequest {
     @NotEmpty
     private String lastName;
     @Schema(description = "Picture used as Person's poster.")
-    @NotEmpty @NotBlankMultipart
+    @NotNull @NotBlankMultipart
     private MultipartFile poster;
 }

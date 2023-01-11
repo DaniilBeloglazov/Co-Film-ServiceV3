@@ -5,6 +5,7 @@ spring:
   servlet:
     multipart:
       enabled: true
+      max-file-size: 6MB
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

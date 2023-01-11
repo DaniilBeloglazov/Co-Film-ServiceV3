@@ -20,7 +20,7 @@ public class Person {
 
     private String lastName;
 
-    private String posterPath;
+    private String avatarUri;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Photo> photos;
@@ -33,5 +33,4 @@ public class Person {
 
     @ManyToMany(mappedBy = "actors")
     private List<Film> actoredFilms;
-
 }

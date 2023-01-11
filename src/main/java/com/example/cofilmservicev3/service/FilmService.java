@@ -40,11 +40,13 @@ public class FilmService {
 
     public FilmProjection getFilm(Long id) {
 
-        return filmRepository.shortFindById(id);
+        FilmProjection filmProjection = filmRepository.shortFindById(id);
+
+        return filmProjection;
     }
 
     @Transactional
-    public void createFilm(Film filmToCreate, MultipartFile posterImage) throws IOException {
+    public Long createFilm(Film filmToCreate, MultipartFile posterImage) throws IOException {
 
         filmToCreate.getDirectors().forEach(person -> personRepository.findById(person.getId())
                 .orElseThrow(() -> new PersonNotFoundException(
@@ -62,10 +64,10 @@ public class FilmService {
                                 MessageFormat.format("Person with id: {0} not found", person.getId())
                         )));
 
-        String posterPath = imageService.saveFilmPoster(posterImage);
-        filmToCreate.setPosterPath(posterPath);
+        String avatarUri = imageService.saveFilmPoster(posterImage);
+        filmToCreate.setAvatarUri(avatarUri);
 
-        filmRepository.save(filmToCreate);
+        return filmRepository.save(filmToCreate).getId();
     }
 
     public void updateFilm(Long id, Film updatedFilm, MultipartFile updatedPoster) throws IOException, InvocationTargetException, IllegalAccessException {
@@ -74,12 +76,12 @@ public class FilmService {
                 .orElseThrow(() -> new FilmNotFoundException(
                         MessageFormat.format("Film with id: {0} not found", id)));
 
-        String posterPath = imageService.updateImage(filmToUpdate.getPosterPath(), updatedPoster);
+        String avatarUri = imageService.updateImage(filmToUpdate.getAvatarUri(), updatedPoster);
 
         beanUtils.copyProperties(filmToUpdate, updatedFilm);
 
 //        updateRelations(filmToUpdate);
-        filmToUpdate.setPosterPath(posterPath);
+        filmToUpdate.setAvatarUri(avatarUri);
 
         filmRepository.save(filmToUpdate);
     }

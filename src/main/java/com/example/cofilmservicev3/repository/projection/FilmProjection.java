@@ -22,7 +22,7 @@ public interface FilmProjection {
 
     Long getAgeRating();
 
-    String getPosterPath();
+    String getAvatarUri();
 
     List<FilmGenreProjection> getGenres();
 

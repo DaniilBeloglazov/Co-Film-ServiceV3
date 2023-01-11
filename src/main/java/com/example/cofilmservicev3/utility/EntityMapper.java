@@ -9,11 +9,11 @@ import com.example.cofilmservicev3.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -34,13 +34,13 @@ public class EntityMapper extends BeanUtilsBean {
         if (name.equals("genres")) {
             List<Genre> genre = (List<Genre>) value;
             value = genre.stream().map((genreForMap) -> genreRepository.findById(genreForMap.getId())
-                    .orElseThrow(() -> new GenreNotFoundException("Genre not found"))).toList();
+                    .orElseThrow(() -> new GenreNotFoundException("Genre not found"))).collect(Collectors.toList());
         }
 
         if (name.equals("directors") || name.equals("writers") || name.equals("actors")){
             List<Person> person = (List<Person>) value;
             value = person.stream().map((personForMap) -> personRepository.findById(personForMap.getId())
-                    .orElseThrow(() -> new PersonNotFoundException("Person not found"))).toList();
+                    .orElseThrow(() -> new PersonNotFoundException("Person not found"))).collect(Collectors.toList());
         }
         super.copyProperty(dest, name, value);
     }
