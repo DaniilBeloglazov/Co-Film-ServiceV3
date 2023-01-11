@@ -35,32 +35,37 @@ public class PersonService {
 
     public PersonProjection getPerson(Long id) {
 
-        return personRepository.findProjection(id);
+        PersonProjection loadedPerson = personRepository.findProjection(id)
+                .orElseThrow(() -> new PersonNotFoundException(
+                        MessageFormat.format("Person with id: {0} not found", id)));
+
+        return loadedPerson;
     }
 
-    public void createPerson(Person personToCreate, MultipartFile posterImage) throws IOException {
+    public Long createPerson(Person personToCreate, MultipartFile posterImage) throws IOException {
 
-        String posterPath = imageService.savePersonPoster(posterImage);
-        personToCreate.setPosterPath(posterPath);
+        String avatarUri = imageService.savePersonPoster(posterImage);
+        personToCreate.setAvatarUri(avatarUri);
 
-        personRepository.save(personToCreate);
+        return personRepository.save(personToCreate).getId();
     }
 
-    public void updatePersonInfo(Long id, Person updatedPerson) throws InvocationTargetException, IllegalAccessException {
+    public void updatePersonInfo(Long id, Person updatedPerson, MultipartFile updatedAvatar) throws InvocationTargetException, IllegalAccessException, IOException {
 
         Person personToUpdate = personRepository.findById(id)
                 .orElseThrow(() -> new PersonNotFoundException(
                         MessageFormat.format("Person with id: {0} not found", id)
                 ));
 
+        String avatarUri = imageService.updateImage(personToUpdate.getAvatarUri(), updatedAvatar);
+
         beanUtils.copyProperties(personToUpdate, updatedPerson);
+        personToUpdate.setAvatarUri(avatarUri);
 
         personRepository.save(personToUpdate);
     }
 
     public void updatePersonPhotos(Long id, MultipartFile[] photos) throws IOException {
-
-
 
         Person personToUpdate = personRepository.findById(id)
                 .orElseThrow(() -> new PersonNotFoundException(
@@ -74,9 +79,10 @@ public class PersonService {
         }
 
         personPhotos.clear();
+
         for (MultipartFile file : photos) {
-            String posterPath = imageService.savePersonPhoto(file);
-            personPhotos.add(new Photo(posterPath, personToUpdate));
+            String avatarUri = imageService.savePersonPhoto(file);
+            personPhotos.add(new Photo(avatarUri, personToUpdate));
         }
 
         personRepository.save(personToUpdate);
