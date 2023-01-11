@@ -5,5 +5,5 @@ public interface PersonFilmProjection {
 
     String getTitle();
 
-    String getPosterPath();
+    String getAvatarUri();
 }

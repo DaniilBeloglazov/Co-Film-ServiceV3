@@ -10,7 +10,7 @@ public interface PersonProjection {
 
     String getLastName();
 
-    String getPosterPath();
+    String getAvatarUri();
 
     List<PhotoProjection> getPhotos();
 
