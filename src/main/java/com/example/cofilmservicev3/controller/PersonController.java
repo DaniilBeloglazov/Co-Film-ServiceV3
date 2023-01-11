@@ -1,7 +1,9 @@
 package com.example.cofilmservicev3.controller;
 
+import com.example.cofilmservicev3.annotation.MultipartSize;
 import com.example.cofilmservicev3.annotation.PageableEndpoint;
 import com.example.cofilmservicev3.dto.CreatePersonRequest;
+import com.example.cofilmservicev3.dto.CreatePersonResponse;
 import com.example.cofilmservicev3.dto.UpdatePersonRequest;
 import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.repository.projection.PersonProjection;
@@ -10,8 +12,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,7 +40,7 @@ public class PersonController {
     @GetMapping("/persons")
     @PageableEndpoint
     public ResponseEntity<List<PersonProjection>> listPersons(
-            @PageableDefault(size = 10, sort = "productionYear,desc") @Parameter(hidden = true) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) @Parameter(hidden = true) Pageable pageable) {
         List<PersonProjection> persons = personService.getAllPersons(pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(persons);
@@ -53,28 +57,30 @@ public class PersonController {
 
     @Operation(summary = "Used to create Person.")
     @PostMapping(value = "/person", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> addPerson(@ModelAttribute @Validated CreatePersonRequest createPersonRequest) throws IOException {
+    public ResponseEntity<CreatePersonResponse> addPerson(@ModelAttribute @Validated CreatePersonRequest createPersonRequest) throws IOException {
 
         Person personToCreate = modelMapper.map(createPersonRequest, Person.class);
-        personService.createPerson(personToCreate, createPersonRequest.getPoster());
+        Long createdPersonId = personService.createPerson(personToCreate, createPersonRequest.getPoster());
+        val payload = new CreatePersonResponse(createdPersonId);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(payload);
     }
 
     @Operation(summary = "Used to update Person by id. All parameters are optional.")
     @PatchMapping(value = "/persons/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updatePerson(@PathVariable Long id, @Validated UpdatePersonRequest updatePersonRequest)
-            throws InvocationTargetException, IllegalAccessException {
+            throws InvocationTargetException, IllegalAccessException, IOException {
 
         Person updatedPerson = modelMapper.map(updatePersonRequest, Person.class);
-        personService.updatePersonInfo(id, updatedPerson);
+        personService.updatePersonInfo(id, updatedPerson, updatePersonRequest.getPoster());
 
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Used to update photos of specific Person.")
     @PutMapping(value = "/persons/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updatePersonPhotos(@PathVariable Long id, @RequestPart MultipartFile[] photos) throws IOException {
+    public ResponseEntity<Void> updatePersonPhotos(
+            @PathVariable Long id, @Validated @RequestPart @MultipartSize(min = 128, max = 4 << 20) MultipartFile[] photos) throws IOException {
 
         personService.updatePersonPhotos(id, photos);
 

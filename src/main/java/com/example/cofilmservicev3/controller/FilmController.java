@@ -2,6 +2,7 @@ package com.example.cofilmservicev3.controller;
 
 import com.example.cofilmservicev3.annotation.PageableEndpoint;
 import com.example.cofilmservicev3.dto.CreateFilmRequest;
+import com.example.cofilmservicev3.dto.CreateFilmResponse;
 import com.example.cofilmservicev3.dto.UpdateFilmRequest;
 import com.example.cofilmservicev3.model.Film;
 import com.example.cofilmservicev3.model.Genre;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
@@ -48,7 +50,7 @@ public class FilmController {
         modelMapper.createTypeMap(CreateFilmRequest.class, Film.class)
                 .addMappings(mapper -> {
                     mapper.skip(Film::setId);
-                    mapper.skip(Film::setPosterPath);
+                    mapper.skip(Film::setAvatarUri);
                 });
         modelMapper.addConverter(new AbstractConverter<Long, Person>() {
             @Override
@@ -87,12 +89,13 @@ public class FilmController {
     }
     @Operation(summary = "Used to create Film.")
     @PostMapping(value = "/film", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
+    public ResponseEntity<CreateFilmResponse> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
 
         Film filmToCreate = modelMapper.map(createFilmRequest, Film.class);
-        filmService.createFilm(filmToCreate, createFilmRequest.getPoster());
+        Long createdFilmId = filmService.createFilm(filmToCreate, createFilmRequest.getPoster());
+        val payload = new CreateFilmResponse(createdFilmId);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(payload);
     }
     @Operation(summary = "Used to update Film by id. All parameters are optional")
     @PatchMapping(value = "/films/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
