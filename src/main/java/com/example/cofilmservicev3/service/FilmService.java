@@ -1,5 +1,6 @@
 package com.example.cofilmservicev3.service;
 
+import com.example.cofilmservicev3.exception.FilmAlreadyExsitsException;
 import com.example.cofilmservicev3.exception.FilmNotFoundException;
 import com.example.cofilmservicev3.exception.PersonNotFoundException;
 import com.example.cofilmservicev3.model.Film;
@@ -47,6 +48,9 @@ public class FilmService {
 
     @Transactional
     public Long createFilm(Film filmToCreate, MultipartFile posterImage) throws IOException {
+
+        if (filmRepository.existsByTitle(filmToCreate.getTitle()))
+            throw new FilmAlreadyExsitsException(MessageFormat.format("Film with title: {0} already exists", filmToCreate.getTitle()));
 
         filmToCreate.getDirectors().forEach(person -> personRepository.findById(person.getId())
                 .orElseThrow(() -> new PersonNotFoundException(

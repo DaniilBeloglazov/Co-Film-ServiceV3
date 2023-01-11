@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.List;
@@ -22,7 +23,7 @@ public class Person {
 
     private String avatarUri;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Photo> photos;
 
     @ManyToMany(mappedBy = "directors")
@@ -33,4 +34,5 @@ public class Person {
 
     @ManyToMany(mappedBy = "actors")
     private List<Film> actoredFilms;
+
 }

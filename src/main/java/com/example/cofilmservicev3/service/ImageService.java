@@ -1,8 +1,7 @@
 package com.example.cofilmservicev3.service;
 
+import com.example.cofilmservicev3.model.Photo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -57,12 +58,28 @@ public class ImageService {
         if (image == null)
             return imagePathUri;
 
-        Files.deleteIfExists(Path.of(parseImageUrl(imagePathUri)));
+        if (Files.deleteIfExists(Path.of(parseImageUri(imagePathUri))))
+            log.info("{} was deleted", imagePathUri);
+
 
         return saveFilmPoster(image);
     }
 
-    private String parseImageUrl(String imagePathUri) {
+    public void deletePhotos(List<Photo> photos) throws IOException {
+
+        List<String> photosUri = photos.stream().map(Photo::getPath).toList();
+
+        String imagePath;
+        for (String photoUri : photosUri) {
+            imagePath = parseImageUri(photoUri);
+            if (Files.deleteIfExists(Path.of(imagePath)))
+                log.info("{} was deleted", imagePath);
+            else
+                log.warn("{} can not delete", imagePath);
+        }
+    }
+
+    private String parseImageUri(String imagePathUri) {
 
         int start = imagePathUri.indexOf("/", 10);
 

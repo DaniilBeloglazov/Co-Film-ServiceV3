@@ -10,6 +10,7 @@ import com.example.cofilmservicev3.repository.projection.PersonProjection;
 import com.example.cofilmservicev3.service.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -40,8 +41,10 @@ public class PersonController {
     @GetMapping("/persons")
     @PageableEndpoint
     public ResponseEntity<List<PersonProjection>> listPersons(
-            @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) @Parameter(hidden = true) Pageable pageable) {
-        List<PersonProjection> persons = personService.getAllPersons(pageable);
+            @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) @Parameter(hidden = true) Pageable pageable,
+            @RequestParam(required = false) String query) {
+
+        List<PersonProjection> persons = personService.getAllPersons(pageable, query);
 
         return ResponseEntity.status(HttpStatus.OK).body(persons);
     }
@@ -74,7 +77,7 @@ public class PersonController {
         Person updatedPerson = modelMapper.map(updatePersonRequest, Person.class);
         personService.updatePersonInfo(id, updatedPerson, updatePersonRequest.getPoster());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Used to update photos of specific Person.")
@@ -84,7 +87,7 @@ public class PersonController {
 
         personService.updatePersonPhotos(id, photos);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @Operation(summary = "Used to delete specific Person by id.")
     @DeleteMapping("/persons/{id}")

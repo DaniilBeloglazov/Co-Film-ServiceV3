@@ -107,7 +107,7 @@ public class FilmController {
         Film updatedFilm = modelMapper.map(updateRequest, Film.class);
         filmService.updateFilm(id, updatedFilm, updateRequest.getPoster());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @Operation(summary = "Used to delete Film by id.")
     @DeleteMapping("/films/{id}")

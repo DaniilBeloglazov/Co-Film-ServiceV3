@@ -13,19 +13,15 @@ import java.util.Optional;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long> {
-    @Query("SELECT person " +
-            "FROM Person person " +
-                "LEFT JOIN person.photos photos " +
-                "LEFT JOIN person.directedFilms directedFilms " +
-                "LEFT JOIN person.writtenFilms writtenFIlms " +
-                "LEFT JOIN person.actoredFilms actoredFilms")
+
+    boolean existsByNameAndLastName(String name, String lastName);
+    @Query("SELECT person FROM Person person " +
+            "WHERE LOWER(person.name) LIKE %:search% OR LOWER(person.lastName) LIKE %:search%")
+    List<PersonProjection> findAllSearch(@Param("search") String searchText, Pageable pageable);
+
+    @Query("SELECT person FROM Person person")
     List<PersonProjection> findAllProjections(Pageable pageable);
-    @Query("SELECT DISTINCT person " + // DISTINCT Optional
-            "FROM Person person " +
-                "LEFT JOIN person.photos photos " +
-                "LEFT JOIN person.directedFilms directedFilms " +
-                "LEFT JOIN person.writtenFilms writers " +
-                "LEFT JOIN person.actoredFilms actors " +
-            "WHERE person.id = :id")
+
+    @Query("SELECT person FROM Person person WHERE person.id = :id")
     Optional<PersonProjection> findProjection(@Param("id") Long id);
 }

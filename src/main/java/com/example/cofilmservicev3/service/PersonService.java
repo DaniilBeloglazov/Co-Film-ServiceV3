@@ -1,5 +1,6 @@
 package com.example.cofilmservicev3.service;
 
+import com.example.cofilmservicev3.exception.PersonAlreadyExistsException;
 import com.example.cofilmservicev3.exception.PersonNotFoundException;
 import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.model.Photo;
@@ -7,8 +8,11 @@ import com.example.cofilmservicev3.repository.PersonRepository;
 import com.example.cofilmservicev3.repository.projection.PersonProjection;
 import com.example.cofilmservicev3.utility.EntityMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,6 +23,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PersonService {
 
@@ -28,7 +33,10 @@ public class PersonService {
 
     private final EntityMapper beanUtils;
 
-    public List<PersonProjection> getAllPersons(Pageable pageable) {
+    public List<PersonProjection> getAllPersons(Pageable pageable, String query) {
+
+        if (query != null)
+            return personRepository.findAllSearch(query, pageable);
 
         return personRepository.findAllProjections(pageable);
     }
@@ -43,6 +51,12 @@ public class PersonService {
     }
 
     public Long createPerson(Person personToCreate, MultipartFile posterImage) throws IOException {
+
+        if (personRepository.existsByNameAndLastName(personToCreate.getName(), personToCreate.getLastName()))
+            throw new PersonAlreadyExistsException(
+                    MessageFormat.format("Person with name: {0} and lastName: {1} already exists",
+                            personToCreate.getName(),
+                            personToCreate.getLastName()));
 
         String avatarUri = imageService.savePersonPoster(posterImage);
         personToCreate.setAvatarUri(avatarUri);
@@ -74,9 +88,7 @@ public class PersonService {
 
         List<Photo> personPhotos = personToUpdate.getPhotos();
 
-        for (Photo photo : personPhotos) {
-            Files.deleteIfExists(Path.of(photo.getPath()));
-        }
+        imageService.deletePhotos(personPhotos);
 
         personPhotos.clear();
 
