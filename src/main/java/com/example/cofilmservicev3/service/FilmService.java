@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class FilmService {
 
@@ -42,12 +43,12 @@ public class FilmService {
 
     public FilmProjection getFilm(Long id) {
 
-        FilmProjection filmProjection = filmRepository.shortFindById(id);
+        FilmProjection filmProjection = filmRepository.shortFindById(id)
+                .orElseThrow(() -> new FilmNotFoundException(MessageFormat.format("Film with id: {0} not found", id)));
 
         return filmProjection;
     }
 
-    @Transactional
     public Long createFilm(Film filmToCreate, MultipartFile posterImage) throws IOException {
 
         if (filmRepository.existsByTitle(filmToCreate.getTitle()))
@@ -76,6 +77,9 @@ public class FilmService {
     }
 
     public void updateFilm(Long id, Film updatedFilm, MultipartFile updatedPoster) throws IOException, InvocationTargetException, IllegalAccessException {
+
+        if (updatedFilm.getTitle() != null && filmRepository.existsByTitle(updatedFilm.getTitle()))
+            throw new FilmAlreadyExsitsException(MessageFormat.format("Film with title: {0} already exists", updatedFilm.getTitle()));
 
         Film filmToUpdate = filmRepository.findById(id)
                 .orElseThrow(() -> new FilmNotFoundException(

@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 @Data
 @NoArgsConstructor @AllArgsConstructor
 public class MessageResponse {
-    @Schema(description = "Message's payload.")
+    @Schema(description = "Message's payload.", example = "Something went wrong")
     private String message;
 }

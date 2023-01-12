@@ -71,9 +71,17 @@ public class PersonService {
                         MessageFormat.format("Person with id: {0} not found", id)
                 ));
 
+        beanUtils.copyProperties(personToUpdate, updatedPerson);
+
+        if (personRepository.existsByNameAndLastName(personToUpdate.getName(), personToUpdate.getLastName()))
+            throw new PersonAlreadyExistsException(MessageFormat.format(
+                    "Person with name: {0} and lastName{1} already exists. Cant update",
+                    personToUpdate.getName(),
+                    personToUpdate.getLastName()
+            ));
+
         String avatarUri = imageService.updateImage(personToUpdate.getAvatarUri(), updatedAvatar);
 
-        beanUtils.copyProperties(personToUpdate, updatedPerson);
         personToUpdate.setAvatarUri(avatarUri);
 
         personRepository.save(personToUpdate);

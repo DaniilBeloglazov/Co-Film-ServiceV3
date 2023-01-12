@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FilmRepository extends JpaRepository<Film, Long> {
@@ -21,6 +22,6 @@ public interface FilmRepository extends JpaRepository<Film, Long> {
     @Query("SELECT film FROM Film film ")
     List<FilmProjection> shortFindAll(Pageable pageable);
     @Query("SELECT film FROM Film film WHERE film.id = :id")
-    FilmProjection shortFindById(@Param("id") Long id);
+    Optional<FilmProjection> shortFindById(@Param("id") Long id);
 
 }

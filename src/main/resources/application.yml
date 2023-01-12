@@ -12,3 +12,4 @@ springdoc:
 server:
   address: 192.168.88.22
   port: 8080
+

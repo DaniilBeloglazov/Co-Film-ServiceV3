@@ -26,11 +26,9 @@ public class EntityMapper extends BeanUtilsBean {
     @Override
     public void copyProperty(Object dest, String name, Object value)
             throws IllegalAccessException, InvocationTargetException {
-        if(value == null || (value instanceof List<?> && (((List<?>) value).isEmpty()))) return; // Do not copy null values
-//        if(value instanceof String && StringUtils.isBlank((String)value)) {
-//            log.debug("Skip blank on copy");
-//            return;
-//        } // Do not copy blank values
+
+        if(value == null) return; // Do not copy null values
+
         if (name.equals("genres")) {
             List<Genre> genre = (List<Genre>) value;
             value = genre.stream().map((genreForMap) -> genreRepository.findById(genreForMap.getId())
