@@ -4,23 +4,35 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity @Table
-@Getter @Setter
+@Setter @Getter
 @NoArgsConstructor @AllArgsConstructor
 public class Person {
 
     @Id @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String lastName;
 
+    @Column(nullable = false)
+    private Double height; // in meters
+
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
+
+    @Transient
+    private Long age;
+
+    @Column(nullable = false)
     private String avatarUri;
 
     @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
@@ -35,4 +47,7 @@ public class Person {
     @ManyToMany(mappedBy = "actors")
     private List<Film> actoredFilms;
 
+    private Long getAge() {
+        return (long) LocalDate.now().until(dateOfBirth).getYears();
+    }
 }

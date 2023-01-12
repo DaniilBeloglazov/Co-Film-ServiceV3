@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+
 @Tag(name = "Person Controller", description = "Used for interaction with Person entity.")
 @RestController
 @RequestMapping("/api/v1")
@@ -51,7 +52,7 @@ public class PersonController {
 
     @Operation(summary = "Used to list specific Person by id.")
     @GetMapping("/persons/{id}")
-    public ResponseEntity<PersonProjection> listPerson(@PathVariable Long id) {
+    public ResponseEntity<PersonProjection> listPerson(@Parameter(description = "Person's id", example = "16") @PathVariable Long id) {
 
         PersonProjection person = personService.getPerson(id);
 
@@ -71,7 +72,8 @@ public class PersonController {
 
     @Operation(summary = "Used to update Person by id. All parameters are optional.")
     @PatchMapping(value = "/persons/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updatePerson(@PathVariable Long id, @Validated UpdatePersonRequest updatePersonRequest)
+    public ResponseEntity<Void> updatePerson(@Parameter(description = "Person's id", example = "16")
+                                             @PathVariable Long id, @Validated UpdatePersonRequest updatePersonRequest)
             throws InvocationTargetException, IllegalAccessException, IOException {
 
         Person updatedPerson = modelMapper.map(updatePersonRequest, Person.class);
@@ -83,15 +85,17 @@ public class PersonController {
     @Operation(summary = "Used to update photos of specific Person.")
     @PutMapping(value = "/persons/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updatePersonPhotos(
-            @PathVariable Long id, @Validated @RequestPart @MultipartSize(min = 128, max = 4 << 20) MultipartFile[] photos) throws IOException {
+            @Parameter(description = "Person's id", example = "16") @PathVariable Long id,
+            @Validated @RequestPart @MultipartSize(min = 128, max = 4 << 20) MultipartFile[] photos) throws IOException {
 
         personService.updatePersonPhotos(id, photos);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @Operation(summary = "Used to delete specific Person by id.")
     @DeleteMapping("/persons/{id}")
-    public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePerson(@Parameter(description = "Person's id", example = "16") @PathVariable Long id) {
 
         return ResponseEntity.ok().build();
     }

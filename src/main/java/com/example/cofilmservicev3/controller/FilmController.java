@@ -84,7 +84,7 @@ public class FilmController {
 
     @Operation(summary = "Used to list specific Film by id.")
     @GetMapping("/films/{id}")
-    public ResponseEntity<FilmProjection> listFilm(@PathVariable Long id) {
+    public ResponseEntity<FilmProjection> listFilm(@Parameter(description = "Film id", example = "16") @PathVariable Long id) {
 
         FilmProjection film = filmService.getFilm(id);
 
@@ -105,7 +105,7 @@ public class FilmController {
     @Operation(summary = "Used to update Film by id. All parameters are optional")
     @PatchMapping(value = "/films/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateFilm(
-            @PathVariable Long id,
+            @Parameter(description = "Film id", example = "16") @PathVariable Long id,
             @Validated UpdateFilmRequest updateRequest
     ) throws IOException, InvocationTargetException, IllegalAccessException {
 
@@ -117,7 +117,7 @@ public class FilmController {
 
     @Operation(summary = "Used to delete Film by id.")
     @DeleteMapping("/films/{id}")
-    public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFilm(@Parameter(description = "Film id", example = "16") @PathVariable Long id) {
 
         filmService.deleteFilm(id);
 

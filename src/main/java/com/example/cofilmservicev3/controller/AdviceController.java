@@ -20,7 +20,7 @@ public class AdviceController {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<MessageResponse> handleInvalidRequests(BindException exception) {
 
-        val message = new MessageResponse(exception.getMessage());
+        val message = new MessageResponse(exception.getFieldError().getDefaultMessage());
 
         if (message.getMessage().contains("Multipart"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
