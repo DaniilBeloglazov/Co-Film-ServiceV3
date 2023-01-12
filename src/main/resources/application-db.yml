@@ -12,3 +12,7 @@ spring:
         highlight_sql: true
     hibernate:
       ddl-auto: update
+  sql:
+    init:
+      mode: always
+      platform: all

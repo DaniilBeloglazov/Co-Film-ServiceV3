@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class Film {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

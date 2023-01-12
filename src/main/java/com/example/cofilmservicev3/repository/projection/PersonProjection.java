@@ -18,6 +18,7 @@ public interface PersonProjection {
     Double getHeight();
 
     LocalDate getDateOfBirth();
+
     @Value("#{target.getDateOfBirth().until(T(java.time.LocalDate).now()).getYears()}")
     Long getAge();
 

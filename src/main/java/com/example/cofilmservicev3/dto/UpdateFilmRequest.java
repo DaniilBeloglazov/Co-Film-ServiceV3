@@ -1,6 +1,5 @@
 package com.example.cofilmservicev3.dto;
 
-import com.example.cofilmservicev3.annotation.NotBlankMultipart;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,39 +14,39 @@ import java.util.List;
 @NoArgsConstructor
 public class UpdateFilmRequest {
 
-    @Schema(description = "Title of the film.")
+    @Schema(description = "Title of the film.", example = "Updated Title")
     private String title;
 
-    @Schema(description = "Description of the film.")
+    @Schema(description = "Description of the film.", example = "Brief(or not) description of the film")
     private String description;
     @Min(1895) @Max(2030)
-    @Schema(description = "Year of film production.")
+    @Schema(description = "Year of film production.", example = "2022")
     private Long productionYear;
 
-    @Schema(description = "Film budget (dollars).")
+    @Schema(description = "Film budget (dollars).", example = "45.500")
     private Double budget; // бюджет
 
-    @Schema(description = "Film box office (dollars).")
+    @Schema(description = "Film box office (dollars).", example = "100500")
     private Double boxOffice; // сборы
 
-    @Schema(description = "Film audience.")
+    @Schema(description = "Film audience.", example = "300000")
     private Long audience;
     @Min(0) @Max(18)
-    @Schema(description = "Minimum allowable age.")
+    @Schema(description = "Minimum allowable age.", minimum = "0", maximum = "18", example = "12")
     private Long ageRating;
-    @NotBlankMultipart
-    @Schema(description = "Picture used as Film's poster.")
+
+    @Schema(description = "Picture used as Film's poster")
     private MultipartFile poster;
 
-    @Schema(description = "Genre ID array.")
+    @Schema(description = "Genre ID array.", example = "[1, 2, 3]")
     private List<Long> genres;
 
-    @Schema(description = "Director ID array")
+    @Schema(description = "Director ID array", example = "[1, 2, 3]")
     private List<Long> directors;
 
-    @Schema(description = "Writer ID array")
+    @Schema(description = "Writer ID array", example = "[1, 2, 3]")
     private List<Long> writers;
 
-    @Schema(description = "Actor ID array")
+    @Schema(description = "Actor ID array", example = "[1, 2, 3]")
     private List<Long> actors;
 }

@@ -1,0 +1,15 @@
+INSERT INTO genre (name)
+VALUES ('Western'),
+       ('Gangster Movie'),
+       ('Detective'),
+       ('Drama'),
+       ('Historical Film'),
+       ('Comedy'),
+       ('Melodrama'),
+       ('Musical Film'),
+       ('Noir'),
+       ('Political Film'),
+       ('Adventure Movie'),
+       ('Fairy'),
+       ('Tragedy'),
+       ('Tragicomedy');

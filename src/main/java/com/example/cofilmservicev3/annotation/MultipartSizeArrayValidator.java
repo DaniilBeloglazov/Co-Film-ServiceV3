@@ -5,8 +5,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraintvalidation.SupportedValidationTarget;
+import javax.validation.constraintvalidation.ValidationTarget;
 
-public class ArrayMultipartSizeValidator implements ConstraintValidator<MultipartSize, MultipartFile[]> {
+@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
+public class MultipartSizeArrayValidator implements ConstraintValidator<MultipartSize, MultipartFile[]> {
     private long min;
     private long max;
     @Override

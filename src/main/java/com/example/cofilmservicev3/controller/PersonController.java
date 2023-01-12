@@ -10,7 +10,6 @@ import com.example.cofilmservicev3.repository.projection.PersonProjection;
 import com.example.cofilmservicev3.service.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -86,7 +85,7 @@ public class PersonController {
     @PutMapping(value = "/persons/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updatePersonPhotos(
             @Parameter(description = "Person's id", example = "16") @PathVariable Long id,
-            @Validated @RequestPart @MultipartSize(min = 128, max = 4 << 20) MultipartFile[] photos) throws IOException {
+            @Validated @MultipartSize(min = 128, max = 4 << 20) MultipartFile[] photos) throws IOException {
 
         personService.updatePersonPhotos(id, photos);
 

@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class Person {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -48,6 +48,8 @@ public class Person {
     private List<Film> actoredFilms;
 
     private Long getAge() {
+        if (dateOfBirth == null)
+            return null;
         return (long) LocalDate.now().until(dateOfBirth).getYears();
     }
 }
