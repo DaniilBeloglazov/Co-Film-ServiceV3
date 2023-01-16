@@ -1,10 +1,19 @@
-First of all:
-* ```mkdir -m777 -p {data/images/film,data/images/person,data/images/person/photo}```
-### Local deployment:
-* ```./mvnw spring-boot:run -Dspring.profiles.active=local -Dmaven.test.skip=true```
-### Containerized deployment:
-* ```./mvnw package -Dspring.profiles.active=docker -Dmaven.test.skip=true```
-* ```docker compose up```
+### 1. First of all:
+#### Clone repository
+* ```git clone https://github.com/DaniilBeloglazov/Co-Film-ServiceV3.git && cd Co-Film-ServiceV3```
+#### Make directories for nginx serving
+* ```cd / && mkdir -m777 -p {data/images/film,data/images/person,data/images/person/photo} && cd -```
+#### Upload Nginx configuration
+* ```sudo cp nginx.conf /etc/nginx/ && sudo nginx -s reload```
+### 2. Deployment:
+#### Local:
+```
+./mvnw spring-boot:run -Dspring.profiles.active=local -Dmaven.test.skip=true
+```
+#### Docker:
+```
+./mvnw package -Dspring.profiles.active=docker -Dmaven.test.skip=true && docker compose up
+```
 
 [//]: # (./mvnw package -Dspring.profiles.active=docker -Dmaven.test.skip)
 
