@@ -1,10 +1,18 @@
+After successfull deployment you can access [Swagger](http://localhost:5030/swagger-ui/index.html) for API information.
+---
 ### 1. First of all:
-#### Clone repository
-* ```git clone https://github.com/DaniilBeloglazov/Co-Film-ServiceV3.git && cd Co-Film-ServiceV3```
-#### Make directories for nginx serving
-* ```cd / && mkdir -m777 -p {data/images/film,data/images/person,data/images/person/photo} && cd -```
-#### Upload Nginx configuration
-* ```sudo cp nginx.conf /etc/nginx/sites-enabled/static-serving.conf && sudo nginx -s reload```
+#### Clone repository.
+```
+git clone https://github.com/DaniilBeloglazov/Co-Film-ServiceV3.git && cd Co-Film-ServiceV3
+```
+#### Make directories for serving static files.
+```
+cd / && mkdir -m777 -p {data/images/film,data/images/person,data/images/person/photo} && cd -
+```
+#### Upload Nginx configuration to your locally installed nginx.
+```
+sudo cp nginx.conf /etc/nginx/sites-enabled/static-serving.conf && sudo nginx -s reload
+```
 ### 2. Deployment:
 #### Local:
 ```
