@@ -1,16 +1,13 @@
 package com.example.cofilmservicev3.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity @Table
-@Getter @Setter
+@Getter @Setter @Builder
 @NoArgsConstructor @AllArgsConstructor
 public class Film {
 

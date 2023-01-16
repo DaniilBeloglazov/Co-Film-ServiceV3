@@ -1,0 +1,39 @@
+version: "1.0"
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: whiteyesx
+      POSTGRES_PASSWORD: whiteyesx
+      POSTGRES_DB: co_film
+    ports:
+      - "5032:5432"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5432"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  nginx:
+    image: nginx
+    volumes:
+     - /data/images:/usr/share/nginx/html
+    ports:
+      - "5031:80"
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      - NGINX_PORT=80
+  app:
+    ports:
+    - "5030:5030"
+    build: .
+    depends_on:
+      - postgres
+      - nginx
+    links:
+      - postgres
+      - nginx
