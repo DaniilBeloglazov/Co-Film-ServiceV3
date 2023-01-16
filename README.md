@@ -15,10 +15,16 @@ sudo cp nginx.conf /etc/nginx/sites-enabled/static-serving.conf && sudo nginx -s
 ```
 ### 2. Deployment:
 #### Local:
+1. Build & Run Jar file
 ```
 ./mvnw spring-boot:run -Dspring.profiles.active=local -Dmaven.test.skip=true
 ```
 #### Docker:
+1. Remove local nginx configuration to avoid errors with port binding.
+```
+sudo rm -f /etc/nginx/sites-enabled/static-serving.conf && sudo nginx -s reload
+```
+2. Build Jar file and run application inside Docker
 ```
 ./mvnw package -Dspring.profiles.active=docker -Dmaven.test.skip=true && docker compose up
 ```
