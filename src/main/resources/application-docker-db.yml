@@ -1,8 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/co_film
+    url: jdbc:postgresql://postgres:5432/co_film
     username: whiteyesx
     password: whiteyesx
+  flyway:
+    user: whiteyesx
+    password: whiteyesx
+    url: jdbc:postgresql://postgres:5432/co_film
   jpa:
     properties:
       hibernate:
@@ -14,5 +18,5 @@ spring:
       ddl-auto: none
 #  sql:
 #    init:
-#      mode:
+#      mode: always
 #      platform: all
