@@ -1,4 +1,4 @@
-After successfull deployment you can access [Swagger](http://localhost:5030/swagger-ui/index.html) for API information.
+After successfull deployment you can access [Swagger-UI](http://localhost:5030/swagger-ui/index.html) for API information.
 ---
 ### 1. First of all:
 #### Clone repository.
