@@ -19,7 +19,7 @@ services:
     volumes:
      - /data/images:/usr/share/nginx/html
     ports:
-      - "5031:80"
+      - "5131:80"
     healthcheck:
       test: ["CMD", "service", "nginx", "status"]
       interval: 30s

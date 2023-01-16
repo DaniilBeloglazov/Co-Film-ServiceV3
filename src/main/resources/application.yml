@@ -6,6 +6,7 @@ spring:
         - nginx
       docker:
         - docker-db
+        - docker-nginx
     default: local
   servlet:
     multipart:
