@@ -1,10 +1,15 @@
 package com.example.cofilmservicev3.service;
 
 import com.example.cofilmservicev3.model.Photo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,14 +18,27 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
 @Service
+@PropertySource("classpath:application-nginx.yml")
+@ConfigurationProperties(prefix = "nginx.server")
 @Slf4j
 public class ImageService {
-    private final String baseUrl = "http://localhost:5031";
+    @Setter
+    private String address;
+    @Setter
+    private String port;
+    private String bootstrapNginx;
     private final String fileSystemRoot = "/data/images";
-    private final String filmPosterRoot = fileSystemRoot + "/film/";
-    private final String personPosterRoot = fileSystemRoot + "/person/";
-    private final String personPhotosRoot = personPosterRoot + "/photo/";
+    private  String filmPosterRoot = fileSystemRoot + "/film/";
+    private  String personPosterRoot = fileSystemRoot + "/person/";
+    private  String personPhotosRoot = personPosterRoot + "/photo/";
+
+    @PostConstruct
+    public void init() {
+        log.info("Loaded config: address - {}, port - {}", address, port);
+        this.bootstrapNginx = address + ":" + port;
+    }
 
 
     public String saveFilmPoster(MultipartFile multipartFile) throws IOException {
@@ -29,7 +47,7 @@ public class ImageService {
         File file = new File(buildImagePath(filmPosterRoot, fileExtension));
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
-        return baseUrl + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
+        return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String savePersonPoster(MultipartFile multipartFile) throws IOException {
@@ -38,7 +56,7 @@ public class ImageService {
         File file = new File(buildImagePath(personPosterRoot, fileExtension));
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
-        return baseUrl + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
+        return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String savePersonPhoto(MultipartFile multipartFile) throws IOException {
@@ -47,7 +65,7 @@ public class ImageService {
         File file = new File(buildImagePath(personPhotosRoot, fileExtension));
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
-        return baseUrl + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
+        return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String updateImage(String imagePathUri, MultipartFile image) throws IOException {
@@ -77,7 +95,7 @@ public class ImageService {
     }
 
     private String buildImagePath(String directoryPath, String extension) {
-        return directoryPath + UUID.randomUUID() + "." + extension;
+        return directoryPath + UUID.randomUUID() + extension;
     }
     /**
      *
@@ -91,6 +109,12 @@ public class ImageService {
         return fileSystemRoot + imagePathUri.substring(start);
     }
 
+    /**
+     * Return extenstion with leading dot included. Example: .jpeg
+     * @param multipartFile
+     * @return
+     */
+    @JsonIgnore
     private String getExtension(MultipartFile multipartFile) {
 
         return "." + multipartFile.getContentType().split("/")[1];

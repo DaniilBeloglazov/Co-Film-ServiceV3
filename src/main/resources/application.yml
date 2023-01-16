@@ -3,6 +3,7 @@ spring:
     group:
       local:
         - db
+        - nginx
       docker:
         - docker-db
     default: local

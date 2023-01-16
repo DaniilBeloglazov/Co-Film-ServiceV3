@@ -3,6 +3,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/co_film
     username: whiteyesx
     password: whiteyesx
+  flyway:
+    user: whiteyesx
+    password: whiteyesx
+    url: jdbc:postgresql://localhost:5432/co_film
   jpa:
     properties:
       hibernate:

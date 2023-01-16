@@ -107,4 +107,14 @@ public class PersonService {
 
         personRepository.save(personToUpdate);
     }
+
+    public void deletePerson(Long id) {
+
+        if (!personRepository.existsById(id))
+            throw new PersonNotFoundException(
+                    MessageFormat.format("Person with id: {0} not found. Cant delete", id)
+            );
+
+        personRepository.deleteById(id);
+    }
 }

@@ -1,0 +1,2 @@
+nginx.server.address: localhost
+nginx.server.port: 5031
