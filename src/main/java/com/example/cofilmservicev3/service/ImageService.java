@@ -16,41 +16,38 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ImageService {
-    private final String baseUrl = "http://192.168.88.22:80";
-    private final String filmPosterRoot = "/data/images/film/";
-    private final String personPosterRoot = "/data/images/person/";
-    private final String personPhotosRoot = "/data/images/person/photo/";
+    private final String baseUrl = "http://localhost:5031";
+    private final String fileSystemRoot = "/data/images";
+    private final String filmPosterRoot = fileSystemRoot + "/film/";
+    private final String personPosterRoot = fileSystemRoot + "/person/";
+    private final String personPhotosRoot = personPosterRoot + "/photo/";
 
-    /**
-     * @param multipartFile
-     * @return Absolute path to saved file
-     * @throws IOException
-     */
+
     public String saveFilmPoster(MultipartFile multipartFile) throws IOException {
 
         String fileExtension = getExtension(multipartFile);
-        File file = new File(filmPosterRoot + UUID.randomUUID() + fileExtension);
+        File file = new File(buildImagePath(filmPosterRoot, fileExtension));
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
-        return baseUrl + file.getAbsolutePath();
+        return baseUrl + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String savePersonPoster(MultipartFile multipartFile) throws IOException {
 
         String fileExtension = getExtension(multipartFile);
-        File file = new File(personPosterRoot + UUID.randomUUID() + fileExtension);
+        File file = new File(buildImagePath(personPosterRoot, fileExtension));
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
-        return baseUrl + file.getAbsolutePath();
+        return baseUrl + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String savePersonPhoto(MultipartFile multipartFile) throws IOException {
 
         String fileExtension = getExtension(multipartFile);
-        File file = new File(personPhotosRoot + UUID.randomUUID() + fileExtension);
+        File file = new File(buildImagePath(personPhotosRoot, fileExtension));
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
-        return baseUrl + file.getAbsolutePath();
+        return baseUrl + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String updateImage(String imagePathUri, MultipartFile image) throws IOException {
@@ -79,11 +76,19 @@ public class ImageService {
         }
     }
 
+    private String buildImagePath(String directoryPath, String extension) {
+        return directoryPath + UUID.randomUUID() + "." + extension;
+    }
+    /**
+     *
+     * @param imagePathUri
+     * @return Image path in file system
+     */
     private String parseImageUri(String imagePathUri) {
 
         int start = imagePathUri.indexOf("/", 10);
 
-        return imagePathUri.substring(start);
+        return fileSystemRoot + imagePathUri.substring(start);
     }
 
     private String getExtension(MultipartFile multipartFile) {
