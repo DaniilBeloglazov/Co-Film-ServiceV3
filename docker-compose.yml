@@ -30,7 +30,7 @@ services:
   app:
     ports:
     - "5030:5030"
-    build: .
+    image: whiteyesx205/film_serivce
     volumes:
       - ./images:/app/images
     depends_on:

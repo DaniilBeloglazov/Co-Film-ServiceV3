@@ -1,2 +1,2 @@
-nginx.server.address: 192.168.88.5
-nginx.server.port: 5131
+nginx.server.address: localhost
+nginx.server.port: 5031
