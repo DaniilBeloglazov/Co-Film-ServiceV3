@@ -7,7 +7,7 @@ git clone https://github.com/DaniilBeloglazov/Co-Film-ServiceV3.git && cd Co-Fil
 ```
 #### Make directories for serving static files.
 ```
-cd / && mkdir -m777 -p {data/images/film,data/images/person,data/images/person/photo} && cd -
+sudo mkdir -m777 -p {~/images/film,~/images/person,~/images/person/photo}
 ```
 #### Upload Nginx configuration to your locally installed nginx.
 ```

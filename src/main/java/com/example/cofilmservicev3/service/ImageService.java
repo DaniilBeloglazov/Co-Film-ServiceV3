@@ -29,7 +29,7 @@ public class ImageService {
     @Setter
     private String port;
     private String bootstrapNginx;
-    private final String fileSystemRoot = "/data/images";
+    private  String fileSystemRoot = new File(".").getAbsolutePath() + "/images";
     private  String filmPosterRoot = fileSystemRoot + "/film/";
     private  String personPosterRoot = fileSystemRoot + "/person/";
     private  String personPhotosRoot = personPosterRoot + "/photo/";
@@ -45,15 +45,16 @@ public class ImageService {
 
         String fileExtension = getExtension(multipartFile);
         File file = new File(buildImagePath(filmPosterRoot, fileExtension));
+        log.info("Trying to write file to: {}", file.getAbsolutePath());
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
         return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String savePersonPoster(MultipartFile multipartFile) throws IOException {
-
         String fileExtension = getExtension(multipartFile);
         File file = new File(buildImagePath(personPosterRoot, fileExtension));
+        log.info("Trying to write file to: {}", file.getAbsolutePath());
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
         return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
@@ -63,6 +64,7 @@ public class ImageService {
 
         String fileExtension = getExtension(multipartFile);
         File file = new File(buildImagePath(personPhotosRoot, fileExtension));
+        log.info("Trying to write file to: {}", file.getAbsolutePath());
         multipartFile.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
         return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
