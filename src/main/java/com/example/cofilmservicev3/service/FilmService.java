@@ -4,6 +4,7 @@ import com.example.cofilmservicev3.exception.FilmAlreadyExsitsException;
 import com.example.cofilmservicev3.exception.FilmNotFoundException;
 import com.example.cofilmservicev3.exception.PersonNotFoundException;
 import com.example.cofilmservicev3.model.Film;
+import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.repository.FilmRepository;
 import com.example.cofilmservicev3.repository.GenreRepository;
 import com.example.cofilmservicev3.repository.PersonRepository;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -54,26 +56,21 @@ public class FilmService {
         if (filmRepository.existsByTitle(filmToCreate.getTitle()))
             throw new FilmAlreadyExsitsException(MessageFormat.format("Film with title: {0} already exists", filmToCreate.getTitle()));
 
-        filmToCreate.getDirectors().forEach(person -> personRepository.findById(person.getId())
-                .orElseThrow(() -> new PersonNotFoundException(
-                        MessageFormat.format("Person with id: {0} not found", person.getId())
-                )));
-
-        filmToCreate.getWriters().forEach(person -> personRepository.findById(person.getId())
-                .orElseThrow(() -> new PersonNotFoundException(
-                        MessageFormat.format("Person with id: {0} not found", person.getId())
-                )));
-
-        filmToCreate.getActors()
-                .forEach(person -> personRepository.findById(person.getId())
-                        .orElseThrow(() -> new PersonNotFoundException(
-                                MessageFormat.format("Person with id: {0} not found", person.getId())
-                        )));
-
+        checkIfPersonsExists(filmToCreate.getDirectors());
+        checkIfPersonsExists(filmToCreate.getWriters());
+        checkIfPersonsExists(filmToCreate.getActors());
+        //TODO MAYBE LOAD PERSONS BY ID
         String avatarUri = imageService.saveFilmPoster(posterImage);
         filmToCreate.setAvatarUri(avatarUri);
 
         return filmRepository.save(filmToCreate).getId();
+    }
+
+    private void checkIfPersonsExists(List<Person> personList) {
+        Optional.ofNullable(personList).ifPresent((people) -> people.forEach(person -> personRepository.findById(person.getId())
+                .orElseThrow(() -> new PersonNotFoundException(
+                        MessageFormat.format("Person with id: {0} not found", person.getId())
+                ))));
     }
 
     public void updateFilm(Long id, Film updatedFilm, MultipartFile updatedPoster) throws IOException, InvocationTargetException, IllegalAccessException {
