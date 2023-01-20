@@ -43,21 +43,19 @@ public class ImageService {
 
     public String saveFilmPoster(MultipartFile multipartFile) throws IOException {
 
-        String fileExtension = getExtension(multipartFile);
-        File file = new File(buildImagePath(filmPosterRoot, fileExtension));
+        return saveImage(filmPosterRoot, multipartFile);
+    }
+    private String saveImage(String destPath, MultipartFile image) throws IOException {
+        String fileExtension = getExtension(image);
+        File file = new File(buildImagePath(destPath, fileExtension));
         log.info("Trying to write file to: {}", file.getAbsolutePath());
-        multipartFile.transferTo(file);
+        image.transferTo(file);
         log.info("File: " + file.getAbsolutePath() + " was saved");
         return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String savePersonPoster(MultipartFile multipartFile) throws IOException {
-        String fileExtension = getExtension(multipartFile);
-        File file = new File(buildImagePath(personPosterRoot, fileExtension));
-        log.info("Trying to write file to: {}", file.getAbsolutePath());
-        multipartFile.transferTo(file);
-        log.info("File: " + file.getAbsolutePath() + " was saved");
-        return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
+        return saveImage(personPosterRoot, multipartFile);
     }
 
     public String savePersonPhoto(MultipartFile multipartFile) throws IOException {
