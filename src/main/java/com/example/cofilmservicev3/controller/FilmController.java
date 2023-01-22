@@ -6,26 +6,16 @@ import com.example.cofilmservicev3.dto.CreateFilmResponse;
 import com.example.cofilmservicev3.dto.MessageResponse;
 import com.example.cofilmservicev3.dto.UpdateFilmRequest;
 import com.example.cofilmservicev3.model.Film;
-import com.example.cofilmservicev3.model.Genre;
 import com.example.cofilmservicev3.model.Person;
-import com.example.cofilmservicev3.repository.projection.FilmProjection;
 import com.example.cofilmservicev3.service.FilmService;
+import com.example.cofilmservicev3.service.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.extensions.Extension;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
-import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,11 +25,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpStatusCodeException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Optional;
 
 @Tag(name = "Film Controller", description = "Used for interaction with Film entity. Also used for adding Persons related to films")
 @RestController
@@ -47,44 +37,32 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
-
+    private final PersonService personService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public FilmController(FilmService filmService, ModelMapper modelMapper) {
+    public FilmController(FilmService filmService, PersonService personService, ModelMapper modelMapper) {
         this.filmService = filmService;
+        this.personService = personService;
         this.modelMapper = modelMapper;
         modelMapper.createTypeMap(CreateFilmRequest.class, Film.class)
                 .addMappings(mapper -> {
                     mapper.skip(Film::setId);
                     mapper.skip(Film::setAvatarUri);
+                    mapper.skip(Film::setDirectors);
+                    mapper.skip(Film::setWriters);
+                    mapper.skip(Film::setActors);
                 });
-        modelMapper.addConverter(new AbstractConverter<Long, Person>() {
-            @Override
-            protected Person convert(Long source) { // For mapping List<Long> to List<Person>
-                Person person = new Person();
-                person.setId(source);
-                return person;
-            }
-        });
-        modelMapper.addConverter(new AbstractConverter<Long, Genre>() {
-            @Override
-            protected Genre convert(Long source) { // For mapping List<Long> to List<Person>
-                Genre genre = new Genre();
-                genre.setId(source);
-                return genre;
-            }
-        });
     }
 
     @Operation(summary = "Used to list all existing Films")
     @GetMapping("/films")
     @PageableEndpoint
-    public ResponseEntity<List<FilmProjection>> listAllFilms(
+    public ResponseEntity<List<Film>> listAllFilms(
             @PageableDefault(size = 10, sort = "productionYear", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable,
             @Parameter(description = "Parameter for searching. (title)") @RequestParam(required = false) String query) {
 
-        List<FilmProjection> films = filmService.getAllFilms(pageable, query);
+        List<Film> films = filmService.getAllFilms(pageable, query);
 
         return ResponseEntity.status(HttpStatus.OK).body(films);
     }
@@ -96,9 +74,9 @@ public class FilmController {
     @ApiResponse(description = "Film was listed", responseCode = "200")
     @Operation(summary = "Used to list specific Film by id.")
     @GetMapping("/films/{id}")
-    public ResponseEntity<FilmProjection> listFilm(@Parameter(description = "Film id", example = "16") @PathVariable Long id) {
+    public ResponseEntity<Film> listFilm(@Parameter(description = "Film id", example = "16") @PathVariable Long id) {
 
-        FilmProjection film = filmService.getFilm(id);
+        Film film = filmService.getFilm(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(film);
     }
@@ -113,10 +91,20 @@ public class FilmController {
     public ResponseEntity<CreateFilmResponse> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
 
         Film filmToCreate = modelMapper.map(createFilmRequest, Film.class);
-        Long createdFilmId = filmService.createFilm(filmToCreate, createFilmRequest.getPoster());
-        val payload = new CreateFilmResponse(createdFilmId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(payload);
+        filmToCreate.setDirectors(getPersons(createFilmRequest.getDirectors()));
+        filmToCreate.setWriters(getPersons(createFilmRequest.getWriters()));
+        filmToCreate.setActors(getPersons(createFilmRequest.getActors()));
+
+        Long createdFilmId = filmService.createFilm(filmToCreate, createFilmRequest.getPoster());
+
+        CreateFilmResponse responseBody = new CreateFilmResponse(createdFilmId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+    }
+
+    private List<Person> getPersons(Optional<List<Long>> personIds) {
+        return personIds.map(ids -> ids.stream().map(personService::getPerson).toList()).orElse(null);
     }
 
     @ApiResponse(description = "Film was updated", responseCode = "200")
@@ -141,6 +129,7 @@ public class FilmController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @ApiResponse(
             description = "Film was deleted",
             responseCode = "200"

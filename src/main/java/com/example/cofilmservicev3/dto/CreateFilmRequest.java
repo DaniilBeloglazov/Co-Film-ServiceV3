@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import java.util.List;
+import java.util.Optional;
+
 @Schema(description = "Data transfer object for Film creation")
 @Data @NoArgsConstructor
 public class CreateFilmRequest {
@@ -48,15 +50,15 @@ public class CreateFilmRequest {
     private MultipartFile poster;
 
     @Schema(description = "Genre ID array.")
-    private List<Long> genres;
+    private Optional<List<Long>> genres;
 
     @Schema(description = "Director ID array")
-    private List<Long> directors;
+    private Optional<List<Long>> directors;
 
     @Schema(description = "Writer ID array")
-    private List<Long> writers;
+    private Optional<List<Long>> writers;
 
     @Schema(description = "Actor ID array")
-    private List<Long> actors;
+    private Optional<List<Long>> actors;
 
 }

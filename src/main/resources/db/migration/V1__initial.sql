@@ -25,28 +25,20 @@ CREATE TABLE public.film (
                              title character varying(255) NOT NULL
 );
 
-ALTER TABLE public.film OWNER TO whiteyesx;
-
 CREATE TABLE public.film_actors (
                                     actored_films_id bigint NOT NULL,
                                     actors_id bigint NOT NULL
 );
-
-ALTER TABLE public.film_actors OWNER TO whiteyesx;
 
 CREATE TABLE public.film_directors (
                                        directed_films_id bigint NOT NULL,
                                        directors_id bigint NOT NULL
 );
 
-ALTER TABLE public.film_directors OWNER TO whiteyesx;
-
 CREATE TABLE public.film_genres (
                                     films_id bigint NOT NULL,
                                     genres_id bigint NOT NULL
 );
-
-ALTER TABLE public.film_genres OWNER TO whiteyesx;
 
 CREATE SEQUENCE public.film_id_seq
     START WITH 1
@@ -55,8 +47,6 @@ CREATE SEQUENCE public.film_id_seq
     NO MAXVALUE
     CACHE 1;
 
-ALTER TABLE public.film_id_seq OWNER TO whiteyesx;
-
 ALTER SEQUENCE public.film_id_seq OWNED BY public.film.id;
 
 CREATE TABLE public.film_writers (
@@ -64,14 +54,10 @@ CREATE TABLE public.film_writers (
                                      writers_id bigint NOT NULL
 );
 
-ALTER TABLE public.film_writers OWNER TO whiteyesx;
-
 CREATE TABLE public.genre (
                               id bigint NOT NULL,
                               name character varying(255)
 );
-
-ALTER TABLE public.genre OWNER TO whiteyesx;
 
 CREATE SEQUENCE public.genre_id_seq
     START WITH 1
@@ -79,8 +65,6 @@ CREATE SEQUENCE public.genre_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-ALTER TABLE public.genre_id_seq OWNER TO whiteyesx;
 
 ALTER SEQUENCE public.genre_id_seq OWNED BY public.genre.id;
 
@@ -94,16 +78,12 @@ CREATE TABLE public.person (
 );
 
 
-ALTER TABLE public.person OWNER TO whiteyesx;
-
 CREATE SEQUENCE public.person_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-ALTER TABLE public.person_id_seq OWNER TO whiteyesx;
 
 ALTER SEQUENCE public.person_id_seq OWNED BY public.person.id;
 
@@ -113,16 +93,12 @@ CREATE TABLE public.photos (
                                owner_id bigint
 );
 
-ALTER TABLE public.photos OWNER TO whiteyesx;
-
 CREATE SEQUENCE public.photos_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-ALTER TABLE public.photos_id_seq OWNER TO whiteyesx;
 
 ALTER SEQUENCE public.photos_id_seq OWNED BY public.photos.id;
 

@@ -7,7 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Optional;
 
 @Schema(description = "Data transfer object for patching Film. All parameters are optional. Blanks will be ignored.")
 @Data
@@ -27,7 +29,8 @@ public class UpdateFilmRequest {
     private Double budget; // бюджет
 
     @Schema(description = "Film box office (dollars).", example = "100500")
-    private Double boxOffice; // сборы
+    @NotEmpty
+    private Optional<Double> boxOffice; // сборы
 
     @Schema(description = "Film audience.", example = "300000")
     private Long audience;

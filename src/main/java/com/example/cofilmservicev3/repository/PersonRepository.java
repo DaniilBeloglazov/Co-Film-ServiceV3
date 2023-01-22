@@ -1,7 +1,6 @@
 package com.example.cofilmservicev3.repository;
 
 import com.example.cofilmservicev3.model.Person;
-import com.example.cofilmservicev3.repository.projection.PersonProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -17,12 +16,12 @@ public interface PersonRepository extends JpaRepository<Person, Long>, JpaSpecif
 
     boolean existsByNameAndLastName(String name, String lastName);
     @Query("SELECT person FROM Person person WHERE LOWER(person.name) LIKE %:search% OR LOWER(person.lastName) LIKE %:search%")
-    List<PersonProjection> findAllSearch(@Param("search") String searchText, Pageable pageable);
+    List<Person> findAllSearch(@Param("search") String searchText, Pageable pageable);
 
     @Query("SELECT person FROM Person person")
-    List<PersonProjection> findAllProjections(Pageable pageable);
+    List<Person> findAllProjections(Pageable pageable);
 
     @Query("SELECT person FROM Person person WHERE person.id = :id")
-    Optional<PersonProjection> findProjection(@Param("id") Long id);
+    Optional<Person> findProjection(@Param("id") Long id);
 
 }

@@ -5,11 +5,8 @@ import com.example.cofilmservicev3.exception.PersonNotFoundException;
 import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.model.Photo;
 import com.example.cofilmservicev3.repository.PersonRepository;
-import com.example.cofilmservicev3.repository.projection.PersonProjection;
 import com.example.cofilmservicev3.utility.EntityMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -33,7 +28,7 @@ public class PersonService {
 
     private final EntityMapper beanUtils;
 
-    public List<PersonProjection> getAllPersons(Pageable pageable, String query) {
+    public List<Person> getAllPersons(Pageable pageable, String query) {
 
         if (query != null)
             return personRepository.findAllSearch(query, pageable);
@@ -41,9 +36,9 @@ public class PersonService {
         return personRepository.findAllProjections(pageable);
     }
 
-    public PersonProjection getPerson(Long id) {
+    public Person getPerson(Long id) {
 
-        PersonProjection loadedPerson = personRepository.findProjection(id)
+        Person loadedPerson = personRepository.findProjection(id)
                 .orElseThrow(() -> new PersonNotFoundException(
                         MessageFormat.format("Person with id: {0} not found", id)));
 

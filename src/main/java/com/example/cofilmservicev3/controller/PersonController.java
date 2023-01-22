@@ -6,7 +6,6 @@ import com.example.cofilmservicev3.dto.CreatePersonRequest;
 import com.example.cofilmservicev3.dto.CreatePersonResponse;
 import com.example.cofilmservicev3.dto.UpdatePersonRequest;
 import com.example.cofilmservicev3.model.Person;
-import com.example.cofilmservicev3.repository.projection.PersonProjection;
 import com.example.cofilmservicev3.service.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,20 +39,20 @@ public class PersonController {
     @Operation(summary = "Used to list all existing Persons.")
     @GetMapping("/persons")
     @PageableEndpoint
-    public ResponseEntity<List<PersonProjection>> listPersons(
+    public ResponseEntity<List<Person>> listPersons(
             @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) @Parameter(hidden = true) Pageable pageable,
             @RequestParam(required = false) String query) {
 
-        List<PersonProjection> persons = personService.getAllPersons(pageable, query);
+        List<Person> persons = personService.getAllPersons(pageable, query);
 
         return ResponseEntity.status(HttpStatus.OK).body(persons);
     }
 
     @Operation(summary = "Used to list specific Person by id.")
     @GetMapping("/persons/{id}")
-    public ResponseEntity<PersonProjection> listPerson(@Parameter(description = "Person's id", example = "16") @PathVariable Long id) {
+    public ResponseEntity<Person> listPerson(@Parameter(description = "Person's id", example = "16") @PathVariable Long id) {
 
-        PersonProjection person = personService.getPerson(id);
+        Person person = personService.getPerson(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(person);
     }

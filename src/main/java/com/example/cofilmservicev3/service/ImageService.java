@@ -29,7 +29,7 @@ public class ImageService {
     @Setter
     private String port;
     private String bootstrapNginx;
-    private  String fileSystemRoot = new File(".").getAbsolutePath() + "/images";
+    private final String fileSystemRoot = "images";
     private  String filmPosterRoot = fileSystemRoot + "/film/";
     private  String personPosterRoot = fileSystemRoot + "/person/";
     private  String personPhotosRoot = personPosterRoot + "/photo/";

@@ -18,6 +18,7 @@ import java.time.LocalDate;
 @Schema(description = "Data transfer object for Person creation.")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class CreatePersonRequest {
+
     @Schema(description = "Name of the Person.", example = "Dwayne")
     @NotEmpty
     private String name;

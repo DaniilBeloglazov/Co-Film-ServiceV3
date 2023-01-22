@@ -2,13 +2,10 @@ package com.example.cofilmservicev3.service;
 
 import com.example.cofilmservicev3.exception.FilmAlreadyExsitsException;
 import com.example.cofilmservicev3.exception.FilmNotFoundException;
-import com.example.cofilmservicev3.exception.PersonNotFoundException;
 import com.example.cofilmservicev3.model.Film;
-import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.repository.FilmRepository;
 import com.example.cofilmservicev3.repository.GenreRepository;
 import com.example.cofilmservicev3.repository.PersonRepository;
-import com.example.cofilmservicev3.repository.projection.FilmProjection;
 import com.example.cofilmservicev3.utility.EntityMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +17,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -35,7 +31,7 @@ public class FilmService {
 
     private final EntityMapper beanUtils;
 
-    public List<FilmProjection> getAllFilms(Pageable pageable, String query) {
+    public List<Film> getAllFilms(Pageable pageable, String query) {
 
         if (query != null)
             return filmRepository.findAllSearch(query, pageable);
@@ -43,34 +39,23 @@ public class FilmService {
         return filmRepository.shortFindAll(pageable);
     }
 
-    public FilmProjection getFilm(Long id) {
+    public Film getFilm(Long id) {
 
-        FilmProjection filmProjection = filmRepository.shortFindById(id)
+        Film Film = filmRepository.shortFindById(id)
                 .orElseThrow(() -> new FilmNotFoundException(MessageFormat.format("Film with id: {0} not found", id)));
 
-        return filmProjection;
+        return Film;
     }
 
     public Long createFilm(Film filmToCreate, MultipartFile posterImage) throws IOException {
 
         if (filmRepository.existsByTitle(filmToCreate.getTitle()))
             throw new FilmAlreadyExsitsException(MessageFormat.format("Film with title: {0} already exists", filmToCreate.getTitle()));
-
-        checkIfPersonsExists(filmToCreate.getDirectors());
-        checkIfPersonsExists(filmToCreate.getWriters());
-        checkIfPersonsExists(filmToCreate.getActors());
-        //TODO MAYBE LOAD PERSONS BY ID
+        
         String avatarUri = imageService.saveFilmPoster(posterImage);
         filmToCreate.setAvatarUri(avatarUri);
 
         return filmRepository.save(filmToCreate).getId();
-    }
-
-    private void checkIfPersonsExists(List<Person> personList) {
-        Optional.ofNullable(personList).ifPresent((people) -> people.forEach(person -> personRepository.findById(person.getId())
-                .orElseThrow(() -> new PersonNotFoundException(
-                        MessageFormat.format("Person with id: {0} not found", person.getId())
-                ))));
     }
 
     public void updateFilm(Long id, Film updatedFilm, MultipartFile updatedPoster) throws IOException, InvocationTargetException, IllegalAccessException {
