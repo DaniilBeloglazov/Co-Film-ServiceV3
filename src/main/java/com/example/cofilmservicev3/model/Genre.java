@@ -1,5 +1,6 @@
 package com.example.cofilmservicev3.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ public class Genre {
     private Long id;
 
     private String name;
-
+    @JsonBackReference
     @ManyToMany(mappedBy = "genres")
     private List<Film> films;
 

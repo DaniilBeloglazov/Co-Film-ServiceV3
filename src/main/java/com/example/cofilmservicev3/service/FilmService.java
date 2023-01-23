@@ -52,8 +52,8 @@ public class FilmService {
         if (filmRepository.existsByTitle(filmToCreate.getTitle()))
             throw new FilmAlreadyExsitsException(MessageFormat.format("Film with title: {0} already exists", filmToCreate.getTitle()));
         
-        String avatarUri = imageService.saveFilmPoster(posterImage);
-        filmToCreate.setAvatarUri(avatarUri);
+        String posterUri = imageService.saveFilmPoster(posterImage);
+        filmToCreate.setPosterUri(posterUri);
 
         return filmRepository.save(filmToCreate).getId();
     }
@@ -61,18 +61,18 @@ public class FilmService {
     public void updateFilm(Long id, Film updatedFilm, MultipartFile updatedPoster) throws IOException, InvocationTargetException, IllegalAccessException {
 
         if (updatedFilm.getTitle() != null && filmRepository.existsByTitle(updatedFilm.getTitle()))
-            throw new FilmAlreadyExsitsException(MessageFormat.format("Film with title: {0} already exists", updatedFilm.getTitle()));
+            throw new FilmAlreadyExsitsException(MessageFormat.format("Film with title: {0} already exists. Can't update", updatedFilm.getTitle()));
 
         Film filmToUpdate = filmRepository.findById(id)
                 .orElseThrow(() -> new FilmNotFoundException(
                         MessageFormat.format("Film with id: {0} not found", id)));
 
-        String avatarUri = imageService.updateImage(filmToUpdate.getAvatarUri(), updatedPoster);
+        String posterPath = imageService.updateImage(filmToUpdate.getPosterUri(), updatedPoster);
 
         beanUtils.copyProperties(filmToUpdate, updatedFilm);
 
 //        updateRelations(filmToUpdate);
-        filmToUpdate.setAvatarUri(avatarUri);
+        filmToUpdate.setPosterUri(posterPath);
 
         filmRepository.save(filmToUpdate);
     }
@@ -115,10 +115,14 @@ public class FilmService {
 //            );
 //    }
 
-    public void deleteFilm(Long id) {
+    public void deleteFilm(Long id) throws IOException {
 
-        if (!filmRepository.existsById(id))
-            throw new FilmNotFoundException(MessageFormat.format("Film with id: {0} not found", id));
+        Film filmToDelete = filmRepository.findById(id)
+                .orElseThrow(() -> new FilmNotFoundException(
+                        MessageFormat.format("Film with id: {0} not found", id)));
+
+        String avatarUri = filmToDelete.getPosterUri();
+        imageService.deleteImage(avatarUri);
 
         filmRepository.deleteById(id);
     }

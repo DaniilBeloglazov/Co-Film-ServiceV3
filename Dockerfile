@@ -1,6 +1,7 @@
 FROM openjdk:17
 WORKDIR app/
-RUN mkdir -p -m777 {/app/images/person/photo,/app/images/film}
+
+RUN mkdir -m777 -p {images/person/photo,images/film}
 
 VOLUME /app/images
 

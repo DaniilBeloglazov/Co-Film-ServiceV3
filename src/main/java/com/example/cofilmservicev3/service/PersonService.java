@@ -91,7 +91,7 @@ public class PersonService {
 
         List<Photo> personPhotos = personToUpdate.getPhotos();
 
-        imageService.deletePhotos(personPhotos);
+        imageService.deletePersonPhotos(personPhotos);
 
         personPhotos.clear();
 

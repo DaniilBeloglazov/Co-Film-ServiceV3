@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.0"
 services:
   postgres:
     image: postgres:15
@@ -30,7 +30,7 @@ services:
   app:
     ports:
     - "5030:5030"
-    image: whiteyesx205/film_serivce
+    image: whiteyesx205/film_service:latest
     volumes:
       - ./images:/app/images
     depends_on:

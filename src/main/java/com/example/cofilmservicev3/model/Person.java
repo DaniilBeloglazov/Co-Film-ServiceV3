@@ -1,5 +1,6 @@
 package com.example.cofilmservicev3.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,16 +35,16 @@ public class Person {
 
     @Column(nullable = false)
     private String avatarUri;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Photo> photos;
-
+    @JsonBackReference
     @ManyToMany(mappedBy = "directors")
     private List<Film> directedFilms;
-
+    @JsonBackReference
     @ManyToMany(mappedBy = "writers")
     private List<Film> writtenFilms;
-
+    @JsonBackReference
     @ManyToMany(mappedBy = "actors")
     private List<Film> actoredFilms;
 

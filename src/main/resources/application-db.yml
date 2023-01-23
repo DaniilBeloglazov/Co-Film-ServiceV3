@@ -1,11 +1,11 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/co_film
-    username: postgres
-    password: postgres
+    username: whiteyesx
+    password: whiteyesx
   flyway:
-    user: postgres
-    password: postgres
+    user: whiteyesx
+    password: whiteyesx
     url: jdbc:postgresql://localhost:5432/co_film
   jpa:
     properties:

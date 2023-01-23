@@ -16,42 +16,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Service
-@PropertySource("classpath:application-nginx.yml")
-@ConfigurationProperties(prefix = "nginx.server")
 @Slf4j
 public class ImageService {
-    @Setter
-    private String address;
-    @Setter
-    private String port;
-    private String bootstrapNginx;
-    private final String fileSystemRoot = "images";
-    private  String filmPosterRoot = fileSystemRoot + "/film/";
-    private  String personPosterRoot = fileSystemRoot + "/person/";
-    private  String personPhotosRoot = personPosterRoot + "/photo/";
-
-    @PostConstruct
-    public void init() {
-        log.info("Loaded config: address - {}, port - {}", address, port);
-        this.bootstrapNginx = address + ":" + port;
-    }
-
+    private final String rootFolder = "images";
+    private String filmPosterRoot = rootFolder + "/film/";
+    private String personPosterRoot = rootFolder + "/person/";
+    private String personPhotosRoot = personPosterRoot + "/photo/";
 
     public String saveFilmPoster(MultipartFile multipartFile) throws IOException {
 
         return saveImage(filmPosterRoot, multipartFile);
-    }
-    private String saveImage(String destPath, MultipartFile image) throws IOException {
-        String fileExtension = getExtension(image);
-        File file = new File(buildImagePath(destPath, fileExtension));
-        log.info("Trying to write file to: {}", file.getAbsolutePath());
-        image.transferTo(file);
-        log.info("File: " + file.getAbsolutePath() + " was saved");
-        return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
     }
 
     public String savePersonPoster(MultipartFile multipartFile) throws IOException {
@@ -59,46 +36,51 @@ public class ImageService {
     }
 
     public String savePersonPhoto(MultipartFile multipartFile) throws IOException {
-
-        String fileExtension = getExtension(multipartFile);
-        File file = new File(buildImagePath(personPhotosRoot, fileExtension));
-        log.info("Trying to write file to: {}", file.getAbsolutePath());
-        multipartFile.transferTo(file);
-        log.info("File: " + file.getAbsolutePath() + " was saved");
-        return bootstrapNginx + file.getAbsolutePath().replaceFirst(fileSystemRoot, "");
+        return saveImage(personPhotosRoot, multipartFile);
     }
 
-    public String updateImage(String imagePathUri, MultipartFile image) throws IOException {
+    public String updateImage(String imagePath, MultipartFile image) throws IOException {
 
         if (image == null)
-            return imagePathUri;
+            return imagePath;
 
-        if (Files.deleteIfExists(Path.of(parseImageUri(imagePathUri))))
-            log.info("{} was deleted", imagePathUri);
+        if (Files.deleteIfExists(Path.of(imagePath)))
+            log.info("{} was deleted", imagePath);
 
 
         return saveFilmPoster(image);
     }
 
-    public void deletePhotos(List<Photo> photos) throws IOException {
-
-        List<String> photosUri = photos.stream().map(Photo::getPath).toList();
-
-        String imagePath;
-        for (String photoUri : photosUri) {
-            imagePath = parseImageUri(photoUri);
-            if (Files.deleteIfExists(Path.of(imagePath)))
-                log.info("{} was deleted", imagePath);
-            else
-                log.warn("{} can not delete", imagePath);
+    public void deleteImage(String imagePath) throws IOException {
+        if (Files.deleteIfExists(Path.of(imagePath))) {
+            log.info("{} was deleted.", imagePath);
+        } else {
+            log.warn("{} wasn't deleted. Not found.");
         }
+    }
+
+    public void deletePersonPhotos(List<Photo> photos) throws IOException {
+        for (String imageUri : photos.stream().map(Photo::getUri).toList()) {
+            deleteImage(imageUri);
+        }
+    }
+
+    private String saveImage(String destPath, MultipartFile image) throws IOException {
+        String fileExtension = getExtension(image);
+        String projectRelativePath = buildImagePath(destPath, fileExtension);
+        File file = new File(projectRelativePath);
+        Path absolutePath = Path.of(file.getAbsolutePath());
+        log.info("Trying to write file to: {}", absolutePath);
+        image.transferTo(absolutePath);
+        log.info("File: " + absolutePath + " was saved");
+        return "/" + projectRelativePath;
     }
 
     private String buildImagePath(String directoryPath, String extension) {
         return directoryPath + UUID.randomUUID() + extension;
     }
+
     /**
-     *
      * @param imagePathUri
      * @return Image path in file system
      */
@@ -106,11 +88,12 @@ public class ImageService {
 
         int start = imagePathUri.indexOf("/", 10);
 
-        return fileSystemRoot + imagePathUri.substring(start);
+        return rootFolder + imagePathUri.substring(start);
     }
 
     /**
-     * Return extenstion with leading dot included. Example: .jpeg
+     * Return extension with leading dot included. Example: .jpeg
+     *
      * @param multipartFile
      * @return
      */

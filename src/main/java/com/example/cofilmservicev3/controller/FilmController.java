@@ -6,8 +6,10 @@ import com.example.cofilmservicev3.dto.CreateFilmResponse;
 import com.example.cofilmservicev3.dto.MessageResponse;
 import com.example.cofilmservicev3.dto.UpdateFilmRequest;
 import com.example.cofilmservicev3.model.Film;
+import com.example.cofilmservicev3.model.Genre;
 import com.example.cofilmservicev3.model.Person;
 import com.example.cofilmservicev3.service.FilmService;
+import com.example.cofilmservicev3.service.GenreService;
 import com.example.cofilmservicev3.service.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,7 +17,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.AbstractCondition;
+import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -33,34 +40,52 @@ import java.util.Optional;
 
 @Tag(name = "Film Controller", description = "Used for interaction with Film entity. Also used for adding Persons related to films")
 @RestController
+@Slf4j
 @RequestMapping("/api/v1")
 public class FilmController {
 
     private final FilmService filmService;
     private final PersonService personService;
     private final ModelMapper modelMapper;
+    private final GenreService genreService;
 
     @Autowired
-    public FilmController(FilmService filmService, PersonService personService, ModelMapper modelMapper) {
+    public FilmController(FilmService filmService, PersonService personService, ModelMapper modelMapper, GenreService genreService) {
         this.filmService = filmService;
         this.personService = personService;
         this.modelMapper = modelMapper;
+        this.genreService = genreService;
         modelMapper.createTypeMap(CreateFilmRequest.class, Film.class)
                 .addMappings(mapper -> {
                     mapper.skip(Film::setId);
-                    mapper.skip(Film::setAvatarUri);
+                    mapper.skip(Film::setPosterUri);
+                    mapper.skip(Film::setGenres);
                     mapper.skip(Film::setDirectors);
                     mapper.skip(Film::setWriters);
                     mapper.skip(Film::setActors);
                 });
+        modelMapper.addConverter(new AbstractConverter<Long, Person>() {
+            @Override
+            protected Person convert(Long source) { // For mapping List<Long> to List<Person>
+                return personService.getPerson(source);
+            }
+        });
+        modelMapper.addConverter(new AbstractConverter<Long, Genre>() {
+            @Override
+            protected Genre convert(Long source) { // For mapping List<Long> to List<Person>
+                return genreService.getGenre(source);
+            }
+        });
     }
 
     @Operation(summary = "Used to list all existing Films")
     @GetMapping("/films")
     @PageableEndpoint
     public ResponseEntity<List<Film>> listAllFilms(
-            @PageableDefault(size = 10, sort = "productionYear", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable,
-            @Parameter(description = "Parameter for searching. (title)") @RequestParam(required = false) String query) {
+            @PageableDefault(size = 10, sort = "productionYear", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable
+                    pageable,
+            @Parameter(description = "Parameter for searching. (title)") @RequestParam(required = false) String
+                    query) {
 
         List<Film> films = filmService.getAllFilms(pageable, query);
 
@@ -88,13 +113,10 @@ public class FilmController {
             content = @Content(schema = @Schema(implementation = MessageResponse.class)))
     @Operation(summary = "Used to create Film.")
     @PostMapping(value = "/film", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CreateFilmResponse> createFilm(@Validated CreateFilmRequest createFilmRequest) throws IOException {
+    public ResponseEntity<CreateFilmResponse> createFilm(@Validated CreateFilmRequest createFilmRequest) throws
+            IOException {
 
         Film filmToCreate = modelMapper.map(createFilmRequest, Film.class);
-
-        filmToCreate.setDirectors(getPersons(createFilmRequest.getDirectors()));
-        filmToCreate.setWriters(getPersons(createFilmRequest.getWriters()));
-        filmToCreate.setActors(getPersons(createFilmRequest.getActors()));
 
         Long createdFilmId = filmService.createFilm(filmToCreate, createFilmRequest.getPoster());
 
@@ -123,10 +145,8 @@ public class FilmController {
             @Parameter(description = "Film id", example = "16") @PathVariable Long id,
             @Validated UpdateFilmRequest updateRequest
     ) throws IOException, InvocationTargetException, IllegalAccessException {
-
-        Film updatedFilm = modelMapper.map(updateRequest, Film.class);
-        filmService.updateFilm(id, updatedFilm, updateRequest.getPoster());
-
+        Film updateMetadata = modelMapper.map(updateRequest, Film.class);
+        filmService.updateFilm(id, updateMetadata, updateRequest.getPoster());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -140,7 +160,8 @@ public class FilmController {
             content = @Content(schema = @Schema(implementation = MessageResponse.class, example = "Film with id: 16 not found")))
     @Operation(summary = "Used to delete Film by id.")
     @DeleteMapping("/films/{id}")
-    public ResponseEntity<Void> deleteFilm(@Parameter(description = "Film id", example = "16") @PathVariable Long id) {
+    public ResponseEntity<Void> deleteFilm(@Parameter(description = "Film id", example = "16") @PathVariable Long
+                                                   id) throws IOException {
 
         filmService.deleteFilm(id);
 

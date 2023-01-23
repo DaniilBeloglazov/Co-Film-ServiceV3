@@ -12,13 +12,13 @@ import javax.persistence.*;
 public class Photo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String path;
+    private String uri;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Person owner;
 
     public Photo(String path, Person owner) {
-        this.path = path;
+        this.uri = path;
         this.owner = owner;
     }
 }

@@ -50,15 +50,15 @@ public class CreateFilmRequest {
     private MultipartFile poster;
 
     @Schema(description = "Genre ID array.")
-    private Optional<List<Long>> genres;
+    private List<Long> genres;
 
     @Schema(description = "Director ID array")
-    private Optional<List<Long>> directors;
+    private List<Long> directors;
 
     @Schema(description = "Writer ID array")
-    private Optional<List<Long>> writers;
+    private List<Long> writers;
 
     @Schema(description = "Actor ID array")
-    private Optional<List<Long>> actors;
+    private List<Long> actors;
 
 }

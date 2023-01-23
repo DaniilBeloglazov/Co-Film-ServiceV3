@@ -17,7 +17,7 @@ CREATE TABLE public.film (
                              id bigint NOT NULL,
                              age_rating bigint NOT NULL,
                              audience bigint NOT NULL,
-                             avatar_uri character varying(255) NOT NULL,
+                             poster_uri character varying(255) NOT NULL,
                              box_office bigint NOT NULL,
                              budget bigint NOT NULL,
                              description text NOT NULL,
@@ -110,7 +110,7 @@ ALTER TABLE ONLY public.person ALTER COLUMN id SET DEFAULT nextval('public.perso
 
 ALTER TABLE ONLY public.photos ALTER COLUMN id SET DEFAULT nextval('public.photos_id_seq'::regclass);
 
-COPY public.film (id, age_rating, audience, avatar_uri, box_office, budget, description, production_year, title) FROM stdin;
+COPY public.film (id, age_rating, audience, poster_uri, box_office, budget, description, production_year, title) FROM stdin;
 \.
 
 COPY public.film_actors (actored_films_id, actors_id) FROM stdin;
