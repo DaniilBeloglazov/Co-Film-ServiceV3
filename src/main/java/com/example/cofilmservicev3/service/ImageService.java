@@ -27,7 +27,6 @@ public class ImageService {
     private String personPhotosRoot = personPosterRoot + "/photo/";
 
     public String saveFilmPoster(MultipartFile multipartFile) throws IOException {
-
         return saveImage(filmPosterRoot, multipartFile);
     }
 
@@ -39,21 +38,21 @@ public class ImageService {
         return saveImage(personPhotosRoot, multipartFile);
     }
 
-    public String updateImage(String imagePath, MultipartFile image) throws IOException {
+    public String updateImage(String imageNginxUri, MultipartFile image) throws IOException {
 
         if (image == null)
-            return imagePath;
+            return imageNginxUri;
 
-        if (Files.deleteIfExists(Path.of(imagePath)))
-            log.info("{} was deleted", imagePath);
+        if (Files.deleteIfExists(Path.of(toFileSystemPath(imageNginxUri))))
+            log.info("{} was deleted", imageNginxUri);
 
 
         return saveFilmPoster(image);
     }
 
-    public void deleteImage(String imagePath) throws IOException {
-        if (Files.deleteIfExists(Path.of(imagePath))) {
-            log.info("{} was deleted.", imagePath);
+    public void deleteImage(String imageNginxUri) throws IOException {
+        if (Files.deleteIfExists(Path.of(toFileSystemPath(imageNginxUri)))) {
+            log.info("{} was deleted.", imageNginxUri);
         } else {
             log.warn("{} wasn't deleted. Not found.");
         }
@@ -73,7 +72,7 @@ public class ImageService {
         log.info("Trying to write file to: {}", absolutePath);
         image.transferTo(absolutePath);
         log.info("File: " + absolutePath + " was saved");
-        return "/" + projectRelativePath;
+        return toNginxUri(projectRelativePath);
     }
 
     private String buildImagePath(String directoryPath, String extension) {
@@ -84,11 +83,13 @@ public class ImageService {
      * @param imagePathUri
      * @return Image path in file system
      */
-    private String parseImageUri(String imagePathUri) {
+    private String toFileSystemPath(String imagePathUri) {
 
-        int start = imagePathUri.indexOf("/", 10);
+        return rootFolder + imagePathUri;
+    }
 
-        return rootFolder + imagePathUri.substring(start);
+    private String toNginxUri(String fileSystemPath) {
+        return fileSystemPath.replaceFirst(rootFolder, "");
     }
 
     /**

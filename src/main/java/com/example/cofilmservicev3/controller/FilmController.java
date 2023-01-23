@@ -59,10 +59,6 @@ public class FilmController {
                 .addMappings(mapper -> {
                     mapper.skip(Film::setId);
                     mapper.skip(Film::setPosterUri);
-                    mapper.skip(Film::setGenres);
-                    mapper.skip(Film::setDirectors);
-                    mapper.skip(Film::setWriters);
-                    mapper.skip(Film::setActors);
                 });
         modelMapper.addConverter(new AbstractConverter<Long, Person>() {
             @Override
